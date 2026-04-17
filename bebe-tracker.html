@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍼 BébéCare — Suivi de bébé</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ee;
+    --blush: #f5ddd5;
+    --rose: #e8a89c;
+    --rose-dark: #c9756a;
+    --sage: #a8c5b5;
+    --sage-dark: #6fa18a;
+    --lavender: #c3b4d4;
+    --sky: #b3d4e8;
+    --gold: #e8c97a;
+    --text: #3d2e2e;
+    --text-light: #7a6060;
+    --white: #ffffff;
+    --shadow: 0 8px 32px rgba(61,46,46,0.10);
+    --shadow-sm: 0 2px 12px rgba(61,46,46,0.07);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background decoration */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(232,168,156,0.18) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -80px; left: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(168,197,181,0.20) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* HEADER */
+  .header {
+    position: relative; z-index: 10;
+    background: linear-gradient(135deg, #f8ede3 0%, #fbeae0 50%, #f0e8f5 100%);
+    border-bottom: 1px solid rgba(232,168,156,0.25);
+    padding: 18px 20px 14px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: var(--rose-dark);
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--sage-dark); font-style: italic; }
+  .baby-age-badge {
+    display: inline-block;
+    margin-top: 4px;
+    background: var(--white);
+    border: 1.5px solid var(--rose);
+    color: var(--rose-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  /* TABS */
+  .tabs {
+    position: sticky; top: 0; z-index: 20;
+    display: flex;
+    background: var(--white);
+    border-bottom: 2px solid var(--blush);
+    box-shadow: var(--shadow-sm);
+  }
+  .tab-btn {
+    flex: 1;
+    border: none; background: none;
+    padding: 13px 8px 11px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .tab-btn .tab-icon { font-size: 1.2rem; }
+  .tab-btn.active {
+    color: var(--rose-dark);
+    border-bottom-color: var(--rose-dark);
+    background: rgba(232,168,156,0.06);
+  }
+
+  /* SECTIONS */
+  .section { display: none; padding: 20px 16px 100px; position: relative; z-index: 5; }
+  .section.active { display: block; }
+
+  /* FEEDING SECTION */
+  .feed-status-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    text-align: center;
+    border: 1.5px solid var(--blush);
+    position: relative;
+    overflow: hidden;
+  }
+  .feed-status-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--rose), var(--lavender), var(--sage));
+  }
+
+  .status-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .timer-display {
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 6px;
+    transition: color 0.5s;
+  }
+  .timer-display.ok { color: var(--sage-dark); }
+  .timer-display.warn { color: var(--gold); }
+  .timer-display.alert { color: var(--rose-dark); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .timer-sub {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+  }
+
+  .alert-banner {
+    display: none;
+    background: linear-gradient(135deg, #fde8e5, #fdd5d0);
+    border: 1.5px solid var(--rose);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--rose-dark);
+    margin-bottom: 14px;
+    animation: shake 0.5s ease-in-out;
+  }
+  .alert-banner.show { display: block; }
+
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+
+  /* BIG FEED BUTTON */
+  .btn-feed {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 6px 20px rgba(201,117,106,0.35);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-feed:active { transform: scale(0.97); }
+  .btn-feed .btn-icon { font-size: 1.4rem; }
+
+  /* RECO CARD */
+  .reco-card {
+    background: linear-gradient(135deg, #edf7f2, #e4f0eb);
+    border: 1.5px solid var(--sage);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .reco-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+  .reco-title { font-size: 0.78rem; font-weight: 700; color: var(--sage-dark); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+  .reco-text { font-size: 0.85rem; color: var(--text); line-height: 1.4; }
+
+  /* HISTORY */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--rose);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  .history-time { font-size: 1rem; font-weight: 800; color: var(--rose-dark); }
+  .history-date { font-size: 0.75rem; color: var(--text-light); }
+  .history-ago { font-size: 0.78rem; font-weight: 700; color: var(--sage-dark); }
+  .btn-delete-feed {
+    background: none; border: none; cursor: pointer;
+    color: var(--rose); font-size: 1rem; padding: 4px;
+    opacity: 0.5; transition: opacity 0.2s;
+  }
+  .btn-delete-feed:hover { opacity: 1; }
+
+  .empty-state {
+    text-align: center; padding: 30px 16px;
+    color: var(--text-light); font-size: 0.9rem;
+  }
+  .empty-state .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; opacity: 0.5; }
+
+  /* SETTINGS */
+  .settings-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+    border: 1.5px solid var(--blush);
+  }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--blush);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-label { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+  .settings-sub { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+  .settings-input {
+    border: 1.5px solid var(--blush);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--cream);
+    width: 130px; text-align: center;
+  }
+
+  /* APPOINTMENTS */
+  .btn-add {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--sage), var(--sage-dark));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(111,161,138,0.35);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .btn-add:active { transform: scale(0.98); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(61,46,46,0.45);
+    backdrop-filter: blur(4px);
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--cream);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%; max-width: 480px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    border: 1.5px solid var(--blush);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--sage);
+  }
+  .form-textarea { resize: vertical; min-height: 70px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-cancel {
+    flex: 1; padding: 13px;
+    background: var(--blush);
+    border: none; border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--text-light); cursor: pointer;
+  }
+  .btn-save {
+    flex: 2; padding: 13px;
+    background: linear-gradient(135deg, var(--sage), var(--sage-dark));
+    border: none; border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem; font-weight: 800;
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(111,161,138,0.35);
+  }
+
+  /* APPT CARDS */
+  .appt-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+    border-left: 5px solid var(--sage);
+    display: flex; gap: 14px; align-items: flex-start;
+    animation: slideIn 0.3s ease;
+  }
+  .appt-card.past { border-left-color: var(--text-light); opacity: 0.6; }
+  .appt-card.today { border-left-color: var(--gold); background: linear-gradient(135deg, #fffbf0, var(--white)); }
+  .appt-card.soon { border-left-color: var(--rose); }
+  .appt-date-block {
+    text-align: center; min-width: 48px;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+  }
+  .appt-day { font-size: 1.5rem; font-weight: 800; color: var(--rose-dark); line-height: 1; }
+  .appt-month { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.5px; }
+  .appt-info { flex: 1; }
+  .appt-type { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sage-dark); margin-bottom: 3px; }
+  .appt-title { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+  .appt-time { font-size: 0.8rem; color: var(--text-light); }
+  .appt-notes { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; font-style: italic; }
+  .btn-del-appt {
+    background: none; border: none; cursor: pointer;
+    color: var(--rose); font-size: 1.1rem; padding: 4px;
+    opacity: 0.4; transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .btn-del-appt:hover { opacity: 1; }
+
+  /* SUIVI SECTION */
+  .growth-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border-top: 4px solid var(--sage);
+  }
+  .stat-card.weight { border-top-color: var(--rose); }
+  .stat-card.height { border-top-color: var(--sky); }
+  .stat-card.head { border-top-color: var(--lavender); }
+  .stat-card.notes { border-top-color: var(--gold); grid-column: span 2; text-align: left; padding: 16px; }
+  .stat-icon { font-size: 1.4rem; margin-bottom: 4px; }
+  .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+  .stat-unit { font-size: 0.75rem; color: var(--text-light); }
+  .stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin-top: 2px; }
+  .stat-date { font-size: 0.7rem; color: var(--text-light); margin-top: 4px; }
+
+  .btn-update-growth {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--lavender), #9e8ec0);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem; font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(180,160,210,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* NOTES */
+  .note-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+    border-left: 4px solid var(--gold);
+    animation: slideIn 0.3s ease;
+  }
+  .note-date { font-size: 0.72rem; color: var(--text-light); margin-bottom: 4px; font-weight: 700; }
+  .note-text { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
+
+  /* SETUP SECTION */
+  .setup-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow);
+    border: 1.5px solid var(--blush);
+    margin-bottom: 16px;
+  }
+  .setup-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--rose-dark);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .btn-save-settings {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+    color: white; border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem; font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(201,117,106,0.3);
+  }
+
+  .frequency-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-top: 8px;
+  }
+  .frequency-table th {
+    background: var(--blush);
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+  }
+  .frequency-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--blush);
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .frequency-table tr.current-age td {
+    background: rgba(168,197,181,0.2);
+    font-weight: 700;
+    color: var(--sage-dark);
+  }
+  .current-badge {
+    display: inline-block;
+    background: var(--sage);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--text);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Filter bar for appointments */
+  .filter-bar {
+    display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px;
+  }
+  .filter-btn {
+    border: 1.5px solid var(--blush);
+    background: var(--white);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: var(--sage-dark);
+    border-color: var(--sage-dark);
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍼 Bébé<span>Care</span></h1>
+  <div class="baby-age-badge" id="ageBadge">Calcul de l'âge…</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('feed', this)">
+    <span class="tab-icon">🍼</span>Tétées
+  </button>
+  <button class="tab-btn" onclick="switchTab('appt', this)">
+    <span class="tab-icon">📅</span>RDV
+  </button>
+  <button class="tab-btn" onclick="switchTab('growth', this)">
+    <span class="tab-icon">📊</span>Suivi
+  </button>
+  <button class="tab-btn" onclick="switchTab('settings', this)">
+    <span class="tab-icon">⚙️</span>Réglages
+  </button>
+</div>
+
+<!-- ========== FEED TAB ========== -->
+<div class="section active" id="tab-feed">
+  <div class="feed-status-card">
+    <div class="status-label">Depuis la dernière tétée</div>
+    <div class="timer-display ok" id="timerDisplay">00:00</div>
+    <div class="timer-sub" id="timerSub">Aucune tétée enregistrée</div>
+    <div class="alert-banner" id="alertBanner">⚠️ Il est temps de donner à manger à bébé !</div>
+  </div>
+
+  <div class="reco-card" id="recoCard">
+    <div class="reco-icon">🌿</div>
+    <div>
+      <div class="reco-title">Recommandation OMS pour bébé</div>
+      <div class="reco-text" id="recoText">Chargement…</div>
+    </div>
+  </div>
+
+  <button class="btn-feed" onclick="logFeed()">
+    <span class="btn-icon">🤱</span>
+    Enregistrer une tétée maintenant
+  </button>
+
+  <br>
+  <div class="section-title">📋 Historique du jour</div>
+  <div class="history-list" id="historyList">
+    <div class="empty-state">
+      <span class="empty-icon">🍼</span>
+      Aucune tétée enregistrée aujourd'hui
+    </div>
+  </div>
+</div>
+
+<!-- ========== APPOINTMENTS TAB ========== -->
+<div class="section" id="tab-appt">
+  <button class="btn-add" onclick="openApptModal()">
+    <span>➕</span> Ajouter un rendez-vous
+  </button>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterAppt('all', this)">Tous</button>
+    <button class="filter-btn" onclick="filterAppt('upcoming', this)">À venir</button>
+    <button class="filter-btn" onclick="filterAppt('past', this)">Passés</button>
+  </div>
+
+  <div id="apptList">
+    <div class="empty-state">
+      <span class="empty-icon">📅</span>
+      Aucun rendez-vous enregistré
+    </div>
+  </div>
+</div>
+
+<!-- ========== GROWTH TAB ========== -->
+<div class="section" id="tab-growth">
+  <div class="growth-grid">
+    <div class="stat-card weight">
+      <div class="stat-icon">⚖️</div>
+      <div class="stat-value" id="statWeight">—</div>
+      <div class="stat-unit">kg</div>
+      <div class="stat-label">Poids</div>
+      <div class="stat-date" id="statWeightDate"></div>
+    </div>
+    <div class="stat-card height">
+      <div class="stat-icon">📏</div>
+      <div class="stat-value" id="statHeight">—</div>
+      <div class="stat-unit">cm</div>
+      <div class="stat-label">Taille</div>
+      <div class="stat-date" id="statHeightDate"></div>
+    </div>
+  </div>
+
+  <button class="btn-update-growth" onclick="openGrowthModal()">
+    <span>📝</span> Mettre à jour les mesures
+  </button>
+
+  <div class="section-title">📝 Notes & Observations</div>
+  <button class="btn-add" style="margin-bottom:12px;" onclick="openNoteModal()">
+    <span>➕</span> Ajouter une note
+  </button>
+  <div id="notesList">
+    <div class="empty-state">
+      <span class="empty-icon">📒</span>
+      Aucune note enregistrée
+    </div>
+  </div>
+</div>
+
+<!-- ========== SETTINGS TAB ========== -->
+<div class="section" id="tab-settings">
+  <div class="setup-card">
+    <div class="setup-title">👶 Informations de bébé</div>
+    <div class="form-group">
+      <label class="form-label">Prénom de bébé</label>
+      <input class="form-input" id="setBabyName" type="text" placeholder="Ex: Lina, Adam…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date de naissance</label>
+      <input class="form-input" id="setBabyDob" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type d'alimentation</label>
+      <select class="form-select" id="setFeedType">
+        <option value="breast">Allaitement maternel</option>
+        <option value="bottle">Lait maternisé (biberon)</option>
+        <option value="mixed">Mixte (sein + biberon)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-title">🔔 Alertes tétées</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Intervalle alerte</div>
+        <div class="settings-sub">Recommandé selon l'âge</div>
+      </div>
+      <select class="settings-input" id="setAlertHours" style="width:auto;">
+        <option value="auto">Auto (âge)</option>
+        <option value="1.5">1h30</option>
+        <option value="2">2h00</option>
+        <option value="2.5">2h30</option>
+        <option value="3">3h00</option>
+        <option value="3.5">3h30</option>
+        <option value="4">4h00</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-title">📚 Tableau des fréquences OMS</div>
+    <table class="frequency-table" id="freqTable">
+      <thead>
+        <tr><th>Âge</th><th>Fréquence</th><th>Tétées/jour</th></tr>
+      </thead>
+      <tbody>
+        <tr data-min="0" data-max="30"><td>0–1 mois</td><td>Toutes 2–3h</td><td>8–12/j</td></tr>
+        <tr data-min="30" data-max="90"><td>1–3 mois</td><td>Toutes 2h30–3h30</td><td>7–9/j</td></tr>
+        <tr data-min="90" data-max="180"><td>3–6 mois</td><td>Toutes 3–4h</td><td>6–8/j</td></tr>
+        <tr data-min="180" data-max="365"><td>6–12 mois</td><td>Toutes 4–5h</td><td>4–6/j</td></tr>
+        <tr data-min="365" data-max="9999"><td>12 mois+</td><td>À la demande</td><td>3–4/j</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="btn-save-settings" onclick="saveSettings()">💾 Sauvegarder les réglages</button>
+  <br><br>
+  <button style="width:100%;padding:12px;background:none;border:1.5px solid var(--blush);border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:0.85rem;color:var(--text-light);cursor:pointer;" onclick="clearAll()">🗑️ Effacer toutes les données</button>
+</div>
+
+<!-- APPOINTMENT MODAL -->
+<div class="modal-overlay" id="apptModal">
+  <div class="modal">
+    <div class="modal-title">📅 Nouveau rendez-vous</div>
+    <div class="form-group">
+      <label class="form-label">Type de rendez-vous</label>
+      <select class="form-select" id="apptType">
+        <option value="Pédiatre">Pédiatre</option>
+        <option value="Vaccin">Vaccin</option>
+        <option value="PMI">PMI / Sage-femme</option>
+        <option value="Urgences">Urgences</option>
+        <option value="Autre">Autre</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Titre</label>
+      <input class="form-input" id="apptTitle" placeholder="Ex: Visite 1 mois">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" id="apptDate" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Heure (optionnel)</label>
+      <input class="form-input" id="apptTime" type="time">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="apptNotes" placeholder="Questions à poser, documents à apporter…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('apptModal')">Annuler</button>
+      <button class="btn-save" onclick="saveAppt()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROWTH MODAL -->
+<div class="modal-overlay" id="growthModal">
+  <div class="modal">
+    <div class="modal-title">📊 Mesures de bébé</div>
+    <div class="form-group">
+      <label class="form-label">Poids (kg)</label>
+      <input class="form-input" id="gWeight" type="number" step="0.01" placeholder="Ex: 3.45">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Taille (cm)</label>
+      <input class="form-input" id="gHeight" type="number" step="0.1" placeholder="Ex: 51.5">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('growthModal')">Annuler</button>
+      <button class="btn-save" onclick="saveGrowth()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <div class="modal-title">📝 Nouvelle note</div>
+    <div class="form-group">
+      <label class="form-label">Note / observation</label>
+      <textarea class="form-textarea" id="noteText" placeholder="Ex: Bébé a souri pour la première fois, selles normales, sommeil agité…" style="min-height:100px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('noteModal')">Annuler</button>
+      <button class="btn-save" onclick="saveNote()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+let data = {
+  babyName: '',
+  babyDob: '',
+  feedType: 'breast',
+  alertHours: 'auto',
+  feeds: [],       // [{ts}]
+  appointments: [], // [{id, type, title, date, time, notes}]
+  growth: { weight: null, weightDate: null, height: null, heightDate: null },
+  notes: []        // [{id, ts, text}]
+};
+
+function load() {
+  const saved = localStorage.getItem('bebecare_v1');
+  if (saved) data = JSON.parse(saved);
+}
+function save() {
+  localStorage.setItem('bebecare_v1', JSON.stringify(data));
+}
+
+// ===== AGE CALC =====
+function getBabyAgeDays() {
+  if (!data.babyDob) return null;
+  const dob = new Date(data.babyDob);
+  const now = new Date();
+  return Math.floor((now - dob) / 86400000);
+}
+
+function getAgeLabel(days) {
+  if (days === null) return 'Âge inconnu';
+  if (days < 7) return `${days} jour${days > 1 ? 's' : ''}`;
+  if (days < 30) return `${Math.floor(days/7)} semaine${Math.floor(days/7) > 1 ? 's' : ''}`;
+  if (days < 365) return `${Math.floor(days/30)} mois`;
+  return `${Math.floor(days/365)} an${Math.floor(days/365) > 1 ? 's' : ''}`;
+}
+
+function getRecommendation(days) {
+  if (days === null) return { text: 'Renseignez la date de naissance de bébé dans Réglages.', intervalH: 3 };
+  if (days < 30) return { text: '0–1 mois : allaitement à la demande, toutes les 2 à 3h. Minimum 8–12 tétées/jour. Ne pas dépasser 6h sans tétée.', intervalH: 3 };
+  if (days < 90) return { text: '1–3 mois : rythme toutes les 2h30–3h30, soit 7–9 tétées/jour. Le bébé commence à espacer légèrement la nuit.', intervalH: 3 };
+  if (days < 180) return { text: '3–6 mois : toutes les 3 à 4h, soit 6–8 tétées/jour. Des périodes nocturnes plus longues apparaissent.', intervalH: 3.5 };
+  if (days < 365) return { text: '6–12 mois : toutes les 4 à 5h, 4–6 tétées/jour. Début de diversification alimentaire en complément.', intervalH: 4.5 };
+  return { text: '12 mois+ : à la demande, 3–4 tétées/jour en complément des repas. Source OMS.', intervalH: 5 };
+}
+
+function getAlertIntervalMs() {
+  if (data.alertHours !== 'auto') {
+    return parseFloat(data.alertHours) * 3600000;
+  }
+  const days = getBabyAgeDays();
+  const { intervalH } = getRecommendation(days);
+  return intervalH * 3600000;
+}
+
+// ===== TIMER =====
+let timerInterval = null;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+  updateTimer();
+}
+
+function updateTimer() {
+  const display = document.getElementById('timerDisplay');
+  const sub = document.getElementById('timerSub');
+  const alertBanner = document.getElementById('alertBanner');
+
+  if (!data.feeds.length) {
+    display.textContent = '--:--';
+    display.className = 'timer-display ok';
+    sub.textContent = 'Aucune tétée enregistrée';
+    alertBanner.classList.remove('show');
+    return;
+  }
+
+  const last = data.feeds[0].ts;
+  const elapsed = Date.now() - last;
+  const alertInterval = getAlertIntervalMs();
+  const ratio = elapsed / alertInterval;
+
+  const h = Math.floor(elapsed / 3600000);
+  const m = Math.floor((elapsed % 3600000) / 60000);
+  const s = Math.floor((elapsed % 60000) / 1000);
+
+  if (h < 10) {
+    display.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  } else {
+    display.textContent = `${h}h${String(m).padStart(2,'0')}`;
+  }
+
+  const lastDate = new Date(last);
+  sub.textContent = `Dernière tétée : ${lastDate.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
+
+  if (ratio < 0.75) {
+    display.className = 'timer-display ok';
+    alertBanner.classList.remove('show');
+  } else if (ratio < 1) {
+    display.className = 'timer-display warn';
+    alertBanner.classList.remove('show');
+  } else {
+    display.className = 'timer-display alert';
+    alertBanner.classList.add('show');
+  }
+}
+
+// ===== FEED =====
+function logFeed() {
+  data.feeds.unshift({ ts: Date.now() });
+  // Keep max 50
+  if (data.feeds.length > 50) data.feeds = data.feeds.slice(0, 50);
+  save();
+  updateTimer();
+  renderHistory();
+  showToast('🤱 Tétée enregistrée !');
+
+  // Browser notification
+  if ('Notification' in window && Notification.permission === 'granted') {
+    // Schedule next
+    const interval = getAlertIntervalMs();
+    setTimeout(() => {
+      new Notification('🍼 BébéCare', { body: "Il est l'heure de la tétée de bébé !", icon: '' });
+    }, interval);
+  } else if ('Notification' in window && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+  }
+}
+
+function deleteFeed(idx) {
+  if (confirm('Supprimer cette tétée ?')) {
+    data.feeds.splice(idx, 1);
+    save();
+    updateTimer();
+    renderHistory();
+  }
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const today = new Date();
+  const todayStr = today.toDateString();
+  const todayFeeds = data.feeds.filter(f => new Date(f.ts).toDateString() === todayStr);
+
+  if (!todayFeeds.length) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">🍼</span>Aucune tétée enregistrée aujourd\'hui</div>';
+    return;
+  }
+
+  list.innerHTML = todayFeeds.map((f, i) => {
+    const d = new Date(f.ts);
+    const globalIdx = data.feeds.indexOf(f);
+    const elapsed = Date.now() - f.ts;
+    const h = Math.floor(elapsed / 3600000);
+    const m = Math.floor((elapsed % 3600000) / 60000);
+    const agoStr = h > 0 ? `il y a ${h}h${m > 0 ? m+'m' : ''}` : `il y a ${m}m`;
+    return `<div class="history-item">
+      <div>
+        <div class="history-time">${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
+        <div class="history-date">${d.toLocaleDateString('fr-FR')}</div>
+      </div>
+      <div class="history-ago">${agoStr}</div>
+      <button class="btn-delete-feed" onclick="deleteFeed(${globalIdx})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ===== APPOINTMENTS =====
+let apptFilter = 'all';
+
+function openApptModal() {
+  document.getElementById('apptTitle').value = '';
+  document.getElementById('apptNotes').value = '';
+  document.getElementById('apptTime').value = '';
+  document.getElementById('apptDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('apptModal').classList.add('open');
+}
+
+function saveAppt() {
+  const title = document.getElementById('apptTitle').value.trim();
+  const date = document.getElementById('apptDate').value;
+  if (!title || !date) { showToast('⚠️ Titre et date obligatoires'); return; }
+  data.appointments.push({
+    id: Date.now(),
+    type: document.getElementById('apptType').value,
+    title,
+    date,
+    time: document.getElementById('apptTime').value,
+    notes: document.getElementById('apptNotes').value.trim()
+  });
+  data.appointments.sort((a,b) => a.date.localeCompare(b.date));
+  save();
+  closeModal('apptModal');
+  renderAppts();
+  showToast('📅 Rendez-vous ajouté !');
+}
+
+function deleteAppt(id) {
+  if (confirm('Supprimer ce rendez-vous ?')) {
+    data.appointments = data.appointments.filter(a => a.id !== id);
+    save();
+    renderAppts();
+  }
+}
+
+function filterAppt(f, btn) {
+  apptFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAppts();
+}
+
+function renderAppts() {
+  const list = document.getElementById('apptList');
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+  let appts = [...data.appointments];
+  if (apptFilter === 'upcoming') appts = appts.filter(a => a.date >= today);
+  if (apptFilter === 'past') appts = appts.filter(a => a.date < today);
+
+  if (!appts.length) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">📅</span>Aucun rendez-vous</div>';
+    return;
+  }
+
+  list.innerHTML = appts.map(a => {
+    const d = new Date(a.date + 'T12:00:00');
+    const day = d.getDate();
+    const month = d.toLocaleDateString('fr-FR', {month:'short'}).replace('.','');
+    let cls = '';
+    if (a.date < today) cls = 'past';
+    else if (a.date === today) cls = 'today';
+    else if (a.date === tomorrow) cls = 'soon';
+
+    const typeColors = { Pédiatre: '🩺', Vaccin: '💉', PMI: '👩‍⚕️', Urgences: '🚨', Autre: '📌' };
+    return `<div class="appt-card ${cls}">
+      <div class="appt-date-block">
+        <div class="appt-day">${day}</div>
+        <div class="appt-month">${month}</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-type">${typeColors[a.type] || '📌'} ${a.type}</div>
+        <div class="appt-title">${a.title}</div>
+        ${a.time ? `<div class="appt-time">⏰ ${a.time}</div>` : ''}
+        ${a.notes ? `<div class="appt-notes">${a.notes}</div>` : ''}
+      </div>
+      <button class="btn-del-appt" onclick="deleteAppt(${a.id})">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+// ===== GROWTH =====
+function openGrowthModal() {
+  document.getElementById('gWeight').value = data.growth.weight || '';
+  document.getElementById('gHeight').value = data.growth.height || '';
+  document.getElementById('growthModal').classList.add('open');
+}
+function saveGrowth() {
+  const w = parseFloat(document.getElementById('gWeight').value);
+  const h = parseFloat(document.getElementById('gHeight').value);
+  const dateStr = new Date().toLocaleDateString('fr-FR');
+  if (!isNaN(w)) { data.growth.weight = w; data.growth.weightDate = dateStr; }
+  if (!isNaN(h)) { data.growth.height = h; data.growth.heightDate = dateStr; }
+  save();
+  closeModal('growthModal');
+  renderGrowth();
+  showToast('📊 Mesures mises à jour !');
+}
+function renderGrowth() {
+  document.getElementById('statWeight').textContent = data.growth.weight ? data.growth.weight.toFixed(2) : '—';
+  document.getElementById('statWeightDate').textContent = data.growth.weightDate ? data.growth.weightDate : '';
+  document.getElementById('statHeight').textContent = data.growth.height ? data.growth.height.toFixed(1) : '—';
+  document.getElementById('statHeightDate').textContent = data.growth.heightDate ? data.growth.heightDate : '';
+}
+
+// ===== NOTES =====
+function openNoteModal() {
+  document.getElementById('noteText').value = '';
+  document.getElementById('noteModal').classList.add('open');
+}
+function saveNote() {
+  const text = document.getElementById('noteText').value.trim();
+  if (!text) return;
+  data.notes.unshift({ id: Date.now(), ts: Date.now(), text });
+  save();
+  closeModal('noteModal');
+  renderNotes();
+  showToast('📝 Note enregistrée !');
+}
+function deleteNote(id) {
+  data.notes = data.notes.filter(n => n.id !== id);
+  save();
+  renderNotes();
+}
+function renderNotes() {
+  const list = document.getElementById('notesList');
+  if (!data.notes.length) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">📒</span>Aucune note</div>';
+    return;
+  }
+  list.innerHTML = data.notes.map(n => `
+    <div class="note-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="note-date">${new Date(n.ts).toLocaleDateString('fr-FR')} – ${new Date(n.ts).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</div>
+        <button style="background:none;border:none;cursor:pointer;color:var(--rose);opacity:0.5;" onclick="deleteNote(${n.id})">✕</button>
+      </div>
+      <div class="note-text">${n.text}</div>
+    </div>
+  `).join('');
+}
+
+// ===== SETTINGS =====
+function loadSettings() {
+  document.getElementById('setBabyName').value = data.babyName || '';
+  document.getElementById('setBabyDob').value = data.babyDob || '';
+  document.getElementById('setFeedType').value = data.feedType || 'breast';
+  document.getElementById('setAlertHours').value = data.alertHours || 'auto';
+}
+
+function saveSettings() {
+  data.babyName = document.getElementById('setBabyName').value.trim();
+  data.babyDob = document.getElementById('setBabyDob').value;
+  data.feedType = document.getElementById('setFeedType').value;
+  data.alertHours = document.getElementById('setAlertHours').value;
+  save();
+  updateHeader();
+  updateReco();
+  highlightCurrentAge();
+  showToast('✅ Réglages sauvegardés !');
+}
+
+function updateHeader() {
+  const days = getBabyAgeDays();
+  const name = data.babyName || 'Bébé';
+  const ageLabel = getAgeLabel(days);
+  document.getElementById('ageBadge').textContent = `${name} · ${ageLabel}`;
+  document.title = `🍼 ${name} · BébéCare`;
+}
+
+function updateReco() {
+  const days = getBabyAgeDays();
+  const { text } = getRecommendation(days);
+  document.getElementById('recoText').textContent = text;
+}
+
+function highlightCurrentAge() {
+  const days = getBabyAgeDays();
+  if (days === null) return;
+  document.querySelectorAll('#freqTable tbody tr').forEach(row => {
+    row.classList.remove('current-age');
+    // Remove old badges
+    row.querySelectorAll('.current-badge').forEach(b => b.remove());
+    const min = parseInt(row.dataset.min);
+    const max = parseInt(row.dataset.max);
+    if (days >= min && days < max) {
+      row.classList.add('current-age');
+      row.cells[0].innerHTML += '<span class="current-badge">✓ Maintenant</span>';
+    }
+  });
+}
+
+// ===== MODAL =====
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ===== TABS =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== CLEAR ALL =====
+function clearAll() {
+  if (confirm('⚠️ Effacer TOUTES les données ? Cette action est irréversible.')) {
+    localStorage.removeItem('bebecare_v1');
+    data = { babyName:'', babyDob:'', feedType:'breast', alertHours:'auto', feeds:[], appointments:[], growth:{weight:null,weightDate:null,height:null,heightDate:null}, notes:[] };
+    renderAll();
+    showToast('🗑️ Données effacées');
+  }
+}
+
+// ===== INIT =====
+function renderAll() {
+  updateHeader();
+  updateReco();
+  highlightCurrentAge();
+  renderHistory();
+  renderAppts();
+  renderGrowth();
+  renderNotes();
+  loadSettings();
+}
+
+load();
+renderAll();
+startTimer();
+
+// Update age every minute
+setInterval(() => {
+  updateHeader();
+  updateReco();
+}, 60000);
+</script>
+</body>
+</html>
