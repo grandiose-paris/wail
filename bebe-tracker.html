@@ -2,1215 +2,680 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍼 BébéCare — Suivi de bébé</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BébéCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #fdf6ee;
-    --blush: #f5ddd5;
-    --rose: #e8a89c;
-    --rose-dark: #c9756a;
-    --sage: #a8c5b5;
-    --sage-dark: #6fa18a;
-    --lavender: #c3b4d4;
-    --sky: #b3d4e8;
-    --gold: #e8c97a;
-    --text: #3d2e2e;
-    --text-light: #7a6060;
-    --white: #ffffff;
-    --shadow: 0 8px 32px rgba(61,46,46,0.10);
-    --shadow-sm: 0 2px 12px rgba(61,46,46,0.07);
-    --radius: 20px;
-    --radius-sm: 12px;
+    --ivory:#faf7f2;--ivory2:#f3ede4;--ivory3:#ebe3d6;
+    --sand:#d6c9b4;--sand2:#bfaf97;
+    --gold:#c8a96e;--gold2:#a8884e;
+    --rose:#c4877a;--rose2:#a3665a;
+    --sage:#7a9e8a;--sage2:#5c8070;
+    --charcoal:#2c2520;--charcoal2:#3d3128;
+    --text:#2c2520;--text2:#6b5c4e;--text3:#9c8a7a;
+    --r:16px;--rs:10px;
   }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--text);display:flex;flex-direction:column;height:100dvh;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .header{background:var(--charcoal2);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .header-brand{display:flex;align-items:baseline;gap:6px;}
+  .header-logo{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:500;color:var(--ivory);letter-spacing:1px;}
+  .header-logo span{color:var(--gold);font-style:italic;}
+  .header-sep{width:1px;height:16px;background:rgba(200,169,110,.35);}
+  .header-age{font-size:.72rem;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--sand);}
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  .tabs{display:flex;background:var(--charcoal);flex-shrink:0;}
+  .tab-btn{flex:1;border:none;background:none;padding:11px 4px 9px;color:var(--sand2);font-family:'Jost',sans-serif;font-size:.65rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;transition:color .2s;}
+  .tab-btn .ti{font-size:1.1rem;}
+  .tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:2px;width:0;background:var(--gold);transition:width .25s;}
+  .tab-btn.active{color:var(--gold);}
+  .tab-btn.active::after{width:28px;}
 
-  /* Background decoration */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -100px; right: -100px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(232,168,156,0.18) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: -80px; left: -80px;
-    width: 350px; height: 350px;
-    background: radial-gradient(circle, rgba(168,197,181,0.20) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
+  .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+  .section{display:none;padding:20px 16px 30px;}
+  .section.active{display:block;}
 
-  /* HEADER */
-  .header {
-    position: relative; z-index: 10;
-    background: linear-gradient(135deg, #f8ede3 0%, #fbeae0 50%, #f0e8f5 100%);
-    border-bottom: 1px solid rgba(232,168,156,0.25);
-    padding: 18px 20px 14px;
-    text-align: center;
-  }
-  .header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
-    color: var(--rose-dark);
-    letter-spacing: -0.5px;
-  }
-  .header h1 span { color: var(--sage-dark); font-style: italic; }
-  .baby-age-badge {
-    display: inline-block;
-    margin-top: 4px;
-    background: var(--white);
-    border: 1.5px solid var(--rose);
-    color: var(--rose-dark);
-    font-size: 0.78rem;
-    font-weight: 700;
-    padding: 3px 12px;
-    border-radius: 20px;
-    letter-spacing: 0.3px;
-  }
+  .card{background:#fff;border-radius:var(--r);padding:20px;margin-bottom:14px;border:1px solid var(--ivory3);position:relative;overflow:hidden;}
+  .card-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2));}
 
-  /* TABS */
-  .tabs {
-    position: sticky; top: 0; z-index: 20;
-    display: flex;
-    background: var(--white);
-    border-bottom: 2px solid var(--blush);
-    box-shadow: var(--shadow-sm);
-  }
-  .tab-btn {
-    flex: 1;
-    border: none; background: none;
-    padding: 13px 8px 11px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-  }
-  .tab-btn .tab-icon { font-size: 1.2rem; }
-  .tab-btn.active {
-    color: var(--rose-dark);
-    border-bottom-color: var(--rose-dark);
-    background: rgba(232,168,156,0.06);
-  }
+  .sec-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--text);letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--sand),transparent);}
 
-  /* SECTIONS */
-  .section { display: none; padding: 20px 16px 100px; position: relative; z-index: 5; }
-  .section.active { display: block; }
+  .timer-ring{display:flex;flex-direction:column;align-items:center;padding:10px 0 16px;}
+  .timer-label{font-size:.65rem;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+  .timer-circle{position:relative;width:160px;height:160px;}
+  .timer-svg{position:absolute;inset:0;transform:rotate(-90deg);}
+  .timer-track{stroke:var(--ivory3);fill:none;stroke-width:4;}
+  .timer-progress{fill:none;stroke-width:4;stroke-linecap:round;stroke-dasharray:439.8;stroke-dashoffset:439.8;transition:stroke-dashoffset .5s,stroke .5s;}
+  .timer-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+  .timer-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:500;color:var(--text);letter-spacing:-1px;line-height:1;}
+  .timer-sub{font-size:.68rem;font-weight:300;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);}
 
-  /* FEEDING SECTION */
-  .feed-status-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 24px 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 16px;
-    text-align: center;
-    border: 1.5px solid var(--blush);
-    position: relative;
-    overflow: hidden;
-  }
-  .feed-status-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--rose), var(--lavender), var(--sage));
-  }
+  .alert-band{background:var(--rose);border-radius:var(--rs);padding:12px 16px;display:none;align-items:center;gap:10px;margin-bottom:14px;}
+  .alert-band.show{display:flex;animation:pulseBg 1.4s ease-in-out infinite;}
+  @keyframes pulseBg{0%,100%{background:var(--rose)}50%{background:var(--rose2)}}
+  .alert-band-icon{font-size:1.3rem;flex-shrink:0;}
+  .alert-band-text{font-size:.85rem;font-weight:500;color:#fff;line-height:1.3;}
+  .btn-stop-alarm{margin-left:auto;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);border-radius:20px;color:#fff;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:1px;padding:5px 12px;cursor:pointer;white-space:nowrap;}
 
-  .status-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 8px;
-  }
+  .session-status{background:linear-gradient(135deg,#e8f5ee,#dff0e6);border:1px solid var(--sage);border-radius:var(--rs);padding:12px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px;}
+  .session-status.show{display:flex;}
+  .session-dot{width:10px;height:10px;border-radius:50%;background:var(--sage2);animation:pulseDot 1.2s ease-in-out infinite;flex-shrink:0;}
+  @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+  .session-text{font-size:.82rem;font-weight:500;color:var(--sage2);}
+  .session-live{font-weight:600;margin-left:4px;color:var(--sage);}
 
-  .timer-display {
-    font-size: 3.2rem;
-    font-weight: 800;
-    letter-spacing: -2px;
-    line-height: 1;
-    margin-bottom: 6px;
-    transition: color 0.5s;
-  }
-  .timer-display.ok { color: var(--sage-dark); }
-  .timer-display.warn { color: var(--gold); }
-  .timer-display.alert { color: var(--rose-dark); animation: pulse 1s infinite; }
+  .btn-row{display:flex;gap:10px;}
+  .btn-primary{flex:1;padding:15px 12px;background:linear-gradient(135deg,var(--charcoal2),var(--charcoal));color:var(--ivory);border:1px solid rgba(200,169,110,.3);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s;}
+  .btn-primary .bi{font-size:1.3rem;}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-primary.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:var(--gold);color:var(--charcoal);}
+  .btn-primary:disabled{opacity:.4;pointer-events:none;}
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
+  .reco-box{background:var(--ivory2);border-left:3px solid var(--gold);border-radius:0 var(--rs) var(--rs) 0;padding:12px 14px;margin-bottom:14px;}
+  .reco-box-title{font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:5px;}
+  .reco-box-text{font-size:.82rem;color:var(--text2);line-height:1.5;}
 
-  .timer-sub {
-    font-size: 0.82rem;
-    color: var(--text-light);
-    margin-bottom: 16px;
-  }
+  .hist-item{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--ivory3);gap:12px;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .hist-item:last-child{border-bottom:none;}
+  .hist-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+  .hist-dot.ended{background:var(--sage);}
+  .hist-info{flex:1;}
+  .hist-time{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--text);line-height:1;}
+  .hist-meta{font-size:.72rem;color:var(--text3);margin-top:2px;display:flex;gap:8px;}
+  .hist-dur{color:var(--sage2);font-weight:500;}
+  .btn-del{background:none;border:none;color:var(--sand2);cursor:pointer;font-size:.9rem;padding:4px 6px;border-radius:6px;}
 
-  .alert-banner {
-    display: none;
-    background: linear-gradient(135deg, #fde8e5, #fdd5d0);
-    border: 1.5px solid var(--rose);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--rose-dark);
-    margin-bottom: 14px;
-    animation: shake 0.5s ease-in-out;
-  }
-  .alert-banner.show { display: block; }
+  .appt-item{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--ivory3);}
+  .appt-item:last-child{border-bottom:none;}
+  .appt-date-col{text-align:center;min-width:44px;background:var(--ivory2);border-radius:var(--rs);padding:8px 6px;border:1px solid var(--ivory3);}
+  .appt-dd{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:500;color:var(--text);line-height:1;}
+  .appt-mm{font-size:.6rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:1px;}
+  .appt-body{flex:1;}
+  .appt-type-tag{font-size:.6rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold2);margin-bottom:4px;display:block;}
+  .appt-title-t{font-size:.9rem;font-weight:500;color:var(--text);}
+  .appt-when{font-size:.75rem;color:var(--text3);margin-top:3px;}
+  .appt-notes-t{font-size:.75rem;color:var(--text2);margin-top:4px;font-style:italic;line-height:1.4;}
+  .appt-item.today{background:linear-gradient(90deg,rgba(200,169,110,.06),transparent);}
+  .appt-item.past .appt-dd,.appt-item.past .appt-title-t{color:var(--text3);}
 
-  @keyframes shake {
-    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
-  }
+  .growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .growth-stat{background:var(--ivory2);border-radius:var(--rs);padding:14px 12px;text-align:center;border:1px solid var(--ivory3);}
+  .gs-icon{font-size:1.2rem;margin-bottom:6px;}
+  .gs-val{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:500;color:var(--text);line-height:1;}
+  .gs-unit{font-size:.72rem;color:var(--text3);}
+  .gs-label{font-size:.6rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;}
+  .gs-date{font-size:.68rem;color:var(--sand2);margin-top:2px;}
 
-  /* BIG FEED BUTTON */
-  .btn-feed {
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Nunito', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 800;
-    cursor: pointer;
-    letter-spacing: 0.3px;
-    box-shadow: 0 6px 20px rgba(201,117,106,0.35);
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .btn-feed:active { transform: scale(0.97); }
-  .btn-feed .btn-icon { font-size: 1.4rem; }
+  .note-item{padding:12px 0;border-bottom:1px solid var(--ivory3);}
+  .note-item:last-child{border-bottom:none;}
+  .note-when{font-size:.7rem;font-weight:500;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:5px;}
+  .note-body{font-size:.85rem;color:var(--text);line-height:1.5;}
 
-  /* RECO CARD */
-  .reco-card {
-    background: linear-gradient(135deg, #edf7f2, #e4f0eb);
-    border: 1.5px solid var(--sage);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    display: flex; align-items: flex-start; gap: 10px;
-  }
-  .reco-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
-  .reco-title { font-size: 0.78rem; font-weight: 700; color: var(--sage-dark); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
-  .reco-text { font-size: 0.85rem; color: var(--text); line-height: 1.4; }
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--ivory3);gap:12px;}
+  .setting-row:last-child{border-bottom:none;}
+  .setting-label{font-size:.85rem;font-weight:500;color:var(--text);}
+  .setting-sub{font-size:.72rem;color:var(--text3);margin-top:2px;}
+  .inp{border:1px solid var(--ivory3);border-radius:var(--rs);padding:9px 12px;font-family:'Jost',sans-serif;font-size:.88rem;color:var(--text);background:var(--ivory);transition:border-color .2s;width:100%;}
+  .inp:focus{outline:none;border-color:var(--gold);}
+  .inp-sm{width:auto;min-width:110px;text-align:center;}
 
-  /* HISTORY */
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
-    color: var(--text);
-    margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .history-list { display: flex; flex-direction: column; gap: 8px; }
-  .history-item {
-    background: var(--white);
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: var(--shadow-sm);
-    border-left: 4px solid var(--rose);
-    animation: slideIn 0.3s ease;
-  }
-  @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-  .history-time { font-size: 1rem; font-weight: 800; color: var(--rose-dark); }
-  .history-date { font-size: 0.75rem; color: var(--text-light); }
-  .history-ago { font-size: 0.78rem; font-weight: 700; color: var(--sage-dark); }
-  .btn-delete-feed {
-    background: none; border: none; cursor: pointer;
-    color: var(--rose); font-size: 1rem; padding: 4px;
-    opacity: 0.5; transition: opacity 0.2s;
-  }
-  .btn-delete-feed:hover { opacity: 1; }
+  .freq-table{width:100%;font-size:.78rem;border-collapse:collapse;}
+  .freq-table th{background:var(--ivory2);padding:8px 10px;font-size:.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--ivory3);}
+  .freq-table td{padding:9px 10px;border-bottom:1px solid var(--ivory3);color:var(--text);}
+  .freq-table tr.cur td{color:var(--sage2);font-weight:600;background:rgba(122,158,138,.06);}
+  .cur-badge{display:inline-block;background:var(--sage);color:#fff;font-size:.55rem;font-weight:600;letter-spacing:1px;padding:2px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;}
 
-  .empty-state {
-    text-align: center; padding: 30px 16px;
-    color: var(--text-light); font-size: 0.9rem;
-  }
-  .empty-state .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; opacity: 0.5; }
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,37,32,.55);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--ivory);border-radius:22px 22px 0 0;padding:6px 20px 34px;width:100%;max-width:500px;max-height:90dvh;overflow-y:auto;animation:slideUp .28s cubic-bezier(.32,.72,0,1);}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-handle{width:36px;height:4px;background:var(--sand);border-radius:2px;margin:10px auto 18px;}
+  .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--text);margin-bottom:18px;}
+  .form-group{margin-bottom:14px;}
+  .form-label{display:block;font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+  textarea.inp{resize:vertical;min-height:72px;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .btn-cancel{flex:1;padding:13px;background:var(--ivory3);border:none;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:1px;color:var(--text2);cursor:pointer;}
+  .btn-confirm{flex:2;padding:13px;background:linear-gradient(135deg,var(--charcoal2),var(--charcoal));border:1px solid rgba(200,169,110,.3);border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ivory);cursor:pointer;}
 
-  /* SETTINGS */
-  .settings-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 18px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 16px;
-    border: 1.5px solid var(--blush);
-  }
-  .settings-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--blush);
-  }
-  .settings-row:last-child { border-bottom: none; }
-  .settings-label { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-  .settings-sub { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
-  .settings-input {
-    border: 1.5px solid var(--blush);
-    border-radius: var(--radius-sm);
-    padding: 6px 10px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--text);
-    background: var(--cream);
-    width: 130px; text-align: center;
-  }
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:var(--ivory);padding:10px 20px;border-radius:30px;font-size:.82rem;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(200,169,110,.25);white-space:nowrap;}
+  .toast.show{opacity:1;}
 
-  /* APPOINTMENTS */
-  .btn-add {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--sage), var(--sage-dark));
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(111,161,138,0.35);
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 16px;
-  }
-  .btn-add:active { transform: scale(0.98); }
+  .sync-badge{font-size:.6rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;background:rgba(200,169,110,.15);color:var(--gold2);border:1px solid rgba(200,169,110,.3);}
+  .sync-badge.ok{background:rgba(122,158,138,.15);color:var(--sage2);border-color:rgba(122,158,138,.3);}
+  .sync-badge.err{background:rgba(196,135,122,.15);color:var(--rose2);border-color:rgba(196,135,122,.3);}
 
-  /* MODAL */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 100;
-    background: rgba(61,46,46,0.45);
-    backdrop-filter: blur(4px);
-    align-items: flex-end; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--cream);
-    border-radius: 24px 24px 0 0;
-    padding: 24px 20px 36px;
-    width: 100%; max-width: 480px;
-    animation: slideUp 0.3s ease;
-  }
-  @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-  .modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    color: var(--text);
-    margin-bottom: 18px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .form-group { margin-bottom: 14px; }
-  .form-label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
-  .form-input, .form-select, .form-textarea {
-    width: 100%;
-    border: 1.5px solid var(--blush);
-    border-radius: var(--radius-sm);
-    padding: 11px 14px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text);
-    background: var(--white);
-    transition: border-color 0.2s;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none; border-color: var(--sage);
-  }
-  .form-textarea { resize: vertical; min-height: 70px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-  .btn-cancel {
-    flex: 1; padding: 13px;
-    background: var(--blush);
-    border: none; border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem; font-weight: 700;
-    color: var(--text-light); cursor: pointer;
-  }
-  .btn-save {
-    flex: 2; padding: 13px;
-    background: linear-gradient(135deg, var(--sage), var(--sage-dark));
-    border: none; border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem; font-weight: 800;
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 14px rgba(111,161,138,0.35);
-  }
+  .btn-add{width:100%;padding:13px;background:none;border:1px dashed var(--sand);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);cursor:pointer;margin-bottom:16px;transition:all .2s;}
+  .empty{text-align:center;padding:30px 0;color:var(--text3);font-size:.82rem;}
+  .empty-icon{font-size:2rem;display:block;margin-bottom:10px;opacity:.4;}
 
-  /* APPT CARDS */
-  .appt-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 12px;
-    border-left: 5px solid var(--sage);
-    display: flex; gap: 14px; align-items: flex-start;
-    animation: slideIn 0.3s ease;
-  }
-  .appt-card.past { border-left-color: var(--text-light); opacity: 0.6; }
-  .appt-card.today { border-left-color: var(--gold); background: linear-gradient(135deg, #fffbf0, var(--white)); }
-  .appt-card.soon { border-left-color: var(--rose); }
-  .appt-date-block {
-    text-align: center; min-width: 48px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    padding: 6px 8px;
-  }
-  .appt-day { font-size: 1.5rem; font-weight: 800; color: var(--rose-dark); line-height: 1; }
-  .appt-month { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.5px; }
-  .appt-info { flex: 1; }
-  .appt-type { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sage-dark); margin-bottom: 3px; }
-  .appt-title { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
-  .appt-time { font-size: 0.8rem; color: var(--text-light); }
-  .appt-notes { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; font-style: italic; }
-  .btn-del-appt {
-    background: none; border: none; cursor: pointer;
-    color: var(--rose); font-size: 1.1rem; padding: 4px;
-    opacity: 0.4; transition: opacity 0.2s; flex-shrink: 0;
-  }
-  .btn-del-appt:hover { opacity: 1; }
-
-  /* SUIVI SECTION */
-  .growth-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    margin-bottom: 16px;
-  }
-  .stat-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 16px 14px;
-    box-shadow: var(--shadow-sm);
-    text-align: center;
-    border-top: 4px solid var(--sage);
-  }
-  .stat-card.weight { border-top-color: var(--rose); }
-  .stat-card.height { border-top-color: var(--sky); }
-  .stat-card.head { border-top-color: var(--lavender); }
-  .stat-card.notes { border-top-color: var(--gold); grid-column: span 2; text-align: left; padding: 16px; }
-  .stat-icon { font-size: 1.4rem; margin-bottom: 4px; }
-  .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text); }
-  .stat-unit { font-size: 0.75rem; color: var(--text-light); }
-  .stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin-top: 2px; }
-  .stat-date { font-size: 0.7rem; color: var(--text-light); margin-top: 4px; }
-
-  .btn-update-growth {
-    width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--lavender), #9e8ec0);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(180,160,210,0.35);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  /* NOTES */
-  .note-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 12px;
-    border-left: 4px solid var(--gold);
-    animation: slideIn 0.3s ease;
-  }
-  .note-date { font-size: 0.72rem; color: var(--text-light); margin-bottom: 4px; font-weight: 700; }
-  .note-text { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
-
-  /* SETUP SECTION */
-  .setup-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 22px 20px;
-    box-shadow: var(--shadow);
-    border: 1.5px solid var(--blush);
-    margin-bottom: 16px;
-  }
-  .setup-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: var(--rose-dark);
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .btn-save-settings {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
-    color: white; border: none;
-    border-radius: var(--radius);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(201,117,106,0.3);
-  }
-
-  .frequency-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.8rem;
-    margin-top: 8px;
-  }
-  .frequency-table th {
-    background: var(--blush);
-    padding: 8px 10px;
-    text-align: left;
-    font-weight: 700;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-light);
-  }
-  .frequency-table td {
-    padding: 9px 10px;
-    border-bottom: 1px solid var(--blush);
-    color: var(--text);
-    vertical-align: middle;
-  }
-  .frequency-table tr.current-age td {
-    background: rgba(168,197,181,0.2);
-    font-weight: 700;
-    color: var(--sage-dark);
-  }
-  .current-badge {
-    display: inline-block;
-    background: var(--sage);
-    color: white;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 4px;
-    font-weight: 700;
-    vertical-align: middle;
-  }
-
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--text);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    z-index: 200;
-    opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; }
-
-  /* Filter bar for appointments */
-  .filter-bar {
-    display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px;
-  }
-  .filter-btn {
-    border: 1.5px solid var(--blush);
-    background: var(--white);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--text-light);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-  }
-  .filter-btn.active {
-    background: var(--sage-dark);
-    border-color: var(--sage-dark);
-    color: white;
-  }
+  .firebase-setup{background:linear-gradient(135deg,#1a1410,#2c2218);border-radius:var(--r);padding:20px;margin-bottom:14px;border:1px solid rgba(200,169,110,.2);}
+  .firebase-setup-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);margin-bottom:12px;}
+  .firebase-setup p{font-size:.78rem;color:var(--sand2);line-height:1.6;margin-bottom:12px;}
+  .firebase-setup .inp{background:rgba(255,255,255,.07);border-color:rgba(200,169,110,.25);color:var(--ivory);font-size:.78rem;}
+  .firebase-setup .inp::placeholder{color:rgba(200,180,150,.35);}
+  .firebase-setup-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--charcoal);cursor:pointer;margin-top:10px;}
+  .save-btn-full{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--charcoal);cursor:pointer;margin-bottom:10px;}
+  .clear-btn-full{width:100%;padding:12px;background:none;border:1px solid var(--ivory3);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);cursor:pointer;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🍼 Bébé<span>Care</span></h1>
-  <div class="baby-age-badge" id="ageBadge">Calcul de l'âge…</div>
+  <div class="header-brand">
+    <div class="header-logo">Bébé<span>Care</span></div>
+    <div class="header-sep"></div>
+    <div class="header-age" id="ageBadge">—</div>
+  </div>
+  <div class="sync-badge" id="syncBadge">Local</div>
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('feed', this)">
-    <span class="tab-icon">🍼</span>Tétées
-  </button>
-  <button class="tab-btn" onclick="switchTab('appt', this)">
-    <span class="tab-icon">📅</span>RDV
-  </button>
-  <button class="tab-btn" onclick="switchTab('growth', this)">
-    <span class="tab-icon">📊</span>Suivi
-  </button>
-  <button class="tab-btn" onclick="switchTab('settings', this)">
-    <span class="tab-icon">⚙️</span>Réglages
-  </button>
+  <button class="tab-btn active" onclick="switchTab('feed',this)"><span class="ti">🍼</span>Tétées</button>
+  <button class="tab-btn" onclick="switchTab('appt',this)"><span class="ti">📅</span>RDV</button>
+  <button class="tab-btn" onclick="switchTab('growth',this)"><span class="ti">📊</span>Suivi</button>
+  <button class="tab-btn" onclick="switchTab('setup',this)"><span class="ti">⚙️</span>Config</button>
 </div>
 
-<!-- ========== FEED TAB ========== -->
+<div class="scroll-area">
+
 <div class="section active" id="tab-feed">
-  <div class="feed-status-card">
-    <div class="status-label">Depuis la dernière tétée</div>
-    <div class="timer-display ok" id="timerDisplay">00:00</div>
-    <div class="timer-sub" id="timerSub">Aucune tétée enregistrée</div>
-    <div class="alert-banner" id="alertBanner">⚠️ Il est temps de donner à manger à bébé !</div>
+  <div class="alert-band" id="alertBand">
+    <span class="alert-band-icon">🔔</span>
+    <div class="alert-band-text">C'est l'heure de la tétée !</div>
+    <button class="btn-stop-alarm" onclick="stopAlarm()">Arrêter</button>
   </div>
-
-  <div class="reco-card" id="recoCard">
-    <div class="reco-icon">🌿</div>
-    <div>
-      <div class="reco-title">Recommandation OMS pour bébé</div>
-      <div class="reco-text" id="recoText">Chargement…</div>
+  <div class="session-status" id="sessionStatus">
+    <div class="session-dot"></div>
+    <div class="session-text">Tétée en cours<span class="session-live" id="sessionLive"></span></div>
+  </div>
+  <div class="card card-gold">
+    <div class="timer-ring">
+      <div class="timer-label">Depuis la dernière tétée</div>
+      <div class="timer-circle">
+        <svg class="timer-svg" viewBox="0 0 150 150">
+          <circle class="timer-track" cx="75" cy="75" r="70"/>
+          <circle class="timer-progress" id="timerProgress" cx="75" cy="75" r="70" stroke="var(--gold)"/>
+        </svg>
+        <div class="timer-inner">
+          <div class="timer-val" id="timerVal">—</div>
+          <div class="timer-sub" id="timerSub">aucune tétée</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary gold" id="btnStart" onclick="startFeed()"><span class="bi">▶</span>Commencer</button>
+      <button class="btn-primary" id="btnEnd" onclick="endFeed()" disabled><span class="bi">⏹</span>Terminer</button>
     </div>
   </div>
-
-  <button class="btn-feed" onclick="logFeed()">
-    <span class="btn-icon">🤱</span>
-    Enregistrer une tétée maintenant
-  </button>
-
-  <br>
-  <div class="section-title">📋 Historique du jour</div>
-  <div class="history-list" id="historyList">
-    <div class="empty-state">
-      <span class="empty-icon">🍼</span>
-      Aucune tétée enregistrée aujourd'hui
-    </div>
+  <div class="reco-box">
+    <div class="reco-box-title">Recommandation OMS</div>
+    <div class="reco-box-text" id="recoText">Configurez l'âge de bébé dans Config.</div>
   </div>
+  <div class="sec-title">Historique du jour</div>
+  <div class="card" id="feedHistCard"><div class="empty"><span class="empty-icon">🍼</span>Aucune tétée aujourd'hui</div></div>
 </div>
 
-<!-- ========== APPOINTMENTS TAB ========== -->
 <div class="section" id="tab-appt">
-  <button class="btn-add" onclick="openApptModal()">
-    <span>➕</span> Ajouter un rendez-vous
-  </button>
-
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="filterAppt('all', this)">Tous</button>
-    <button class="filter-btn" onclick="filterAppt('upcoming', this)">À venir</button>
-    <button class="filter-btn" onclick="filterAppt('past', this)">Passés</button>
-  </div>
-
-  <div id="apptList">
-    <div class="empty-state">
-      <span class="empty-icon">📅</span>
-      Aucun rendez-vous enregistré
-    </div>
-  </div>
+  <button class="btn-add" onclick="openModal('apptModal')">+ Ajouter un rendez-vous</button>
+  <div class="sec-title">Rendez-vous</div>
+  <div class="card" id="apptListCard"><div class="empty"><span class="empty-icon">📅</span>Aucun rendez-vous</div></div>
 </div>
 
-<!-- ========== GROWTH TAB ========== -->
 <div class="section" id="tab-growth">
   <div class="growth-grid">
-    <div class="stat-card weight">
-      <div class="stat-icon">⚖️</div>
-      <div class="stat-value" id="statWeight">—</div>
-      <div class="stat-unit">kg</div>
-      <div class="stat-label">Poids</div>
-      <div class="stat-date" id="statWeightDate"></div>
-    </div>
-    <div class="stat-card height">
-      <div class="stat-icon">📏</div>
-      <div class="stat-value" id="statHeight">—</div>
-      <div class="stat-unit">cm</div>
-      <div class="stat-label">Taille</div>
-      <div class="stat-date" id="statHeightDate"></div>
-    </div>
+    <div class="growth-stat"><div class="gs-icon">⚖️</div><div class="gs-val" id="gvWeight">—</div><div class="gs-unit">kg</div><div class="gs-label">Poids</div><div class="gs-date" id="gdWeight"></div></div>
+    <div class="growth-stat"><div class="gs-icon">📏</div><div class="gs-val" id="gvHeight">—</div><div class="gs-unit">cm</div><div class="gs-label">Taille</div><div class="gs-date" id="gdHeight"></div></div>
   </div>
-
-  <button class="btn-update-growth" onclick="openGrowthModal()">
-    <span>📝</span> Mettre à jour les mesures
-  </button>
-
-  <div class="section-title">📝 Notes & Observations</div>
-  <button class="btn-add" style="margin-bottom:12px;" onclick="openNoteModal()">
-    <span>➕</span> Ajouter une note
-  </button>
-  <div id="notesList">
-    <div class="empty-state">
-      <span class="empty-icon">📒</span>
-      Aucune note enregistrée
-    </div>
-  </div>
+  <button class="btn-add" onclick="openModal('growthModal')">+ Mettre à jour les mesures</button>
+  <div class="sec-title">Notes & observations</div>
+  <button class="btn-add" onclick="openModal('noteModal')">+ Ajouter une note</button>
+  <div class="card" id="notesCard"><div class="empty"><span class="empty-icon">📒</span>Aucune note</div></div>
 </div>
 
-<!-- ========== SETTINGS TAB ========== -->
-<div class="section" id="tab-settings">
-  <div class="setup-card">
-    <div class="setup-title">👶 Informations de bébé</div>
-    <div class="form-group">
-      <label class="form-label">Prénom de bébé</label>
-      <input class="form-input" id="setBabyName" type="text" placeholder="Ex: Lina, Adam…">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Date de naissance</label>
-      <input class="form-input" id="setBabyDob" type="date">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Type d'alimentation</label>
-      <select class="form-select" id="setFeedType">
-        <option value="breast">Allaitement maternel</option>
-        <option value="bottle">Lait maternisé (biberon)</option>
-        <option value="mixed">Mixte (sein + biberon)</option>
-      </select>
+<div class="section" id="tab-setup">
+  <div class="firebase-setup">
+    <div class="firebase-setup-title">🔥 Synchronisation Firebase</div>
+    <p>Pour synchroniser sur tous vos appareils, créez un projet gratuit sur <strong style="color:var(--gold)">console.firebase.google.com</strong> → Realtime Database, puis entrez vos clés ci-dessous.</p>
+    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">API Key</label><input class="inp" id="fbApiKey" type="text" placeholder="AIzaSy..."></div>
+    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">Project ID</label><input class="inp" id="fbProjectId" type="text" placeholder="mon-projet-bebecare"></div>
+    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">App ID</label><input class="inp" id="fbAppId" type="text" placeholder="1:123456789:web:abc..."></div>
+    <button class="firebase-setup-btn" onclick="saveFirebase()">Connecter Firebase</button>
+    <p style="margin-top:10px;margin-bottom:0;font-size:.7rem;opacity:.5;">Sans Firebase, les données sont sauvegardées localement sur cet appareil uniquement.</p>
+  </div>
+  <div class="card">
+    <div class="sec-title">Bébé</div>
+    <div class="setting-row"><div><div class="setting-label">Prénom</div></div><input class="inp inp-sm" id="cfgName" type="text" placeholder="Prénom"></div>
+    <div class="setting-row"><div><div class="setting-label">Date de naissance</div></div><input class="inp inp-sm" id="cfgDob" type="date"></div>
+    <div class="setting-row"><div><div class="setting-label">Alimentation</div></div><select class="inp inp-sm" id="cfgFeed"><option value="breast">Allaitement</option><option value="bottle">Biberon</option><option value="mixed">Mixte</option></select></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Alerte tétée</div>
+    <div class="setting-row">
+      <div><div class="setting-label">Intervalle</div><div class="setting-sub">Auto = selon l'âge OMS</div></div>
+      <select class="inp inp-sm" id="cfgAlert"><option value="auto">Auto</option><option value="1.5">1h30</option><option value="2">2h00</option><option value="2.5">2h30</option><option value="3">3h00</option><option value="3.5">3h30</option><option value="4">4h00</option><option value="5">5h00</option></select>
     </div>
   </div>
-
-  <div class="setup-card">
-    <div class="setup-title">🔔 Alertes tétées</div>
-    <div class="settings-row">
-      <div>
-        <div class="settings-label">Intervalle alerte</div>
-        <div class="settings-sub">Recommandé selon l'âge</div>
-      </div>
-      <select class="settings-input" id="setAlertHours" style="width:auto;">
-        <option value="auto">Auto (âge)</option>
-        <option value="1.5">1h30</option>
-        <option value="2">2h00</option>
-        <option value="2.5">2h30</option>
-        <option value="3">3h00</option>
-        <option value="3.5">3h30</option>
-        <option value="4">4h00</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="setup-card">
-    <div class="setup-title">📚 Tableau des fréquences OMS</div>
-    <table class="frequency-table" id="freqTable">
-      <thead>
-        <tr><th>Âge</th><th>Fréquence</th><th>Tétées/jour</th></tr>
-      </thead>
+  <div class="card">
+    <div class="sec-title">Référentiel OMS</div>
+    <table class="freq-table" id="freqTable">
+      <thead><tr><th>Âge</th><th>Fréquence</th><th>/Jour</th></tr></thead>
       <tbody>
-        <tr data-min="0" data-max="30"><td>0–1 mois</td><td>Toutes 2–3h</td><td>8–12/j</td></tr>
-        <tr data-min="30" data-max="90"><td>1–3 mois</td><td>Toutes 2h30–3h30</td><td>7–9/j</td></tr>
-        <tr data-min="90" data-max="180"><td>3–6 mois</td><td>Toutes 3–4h</td><td>6–8/j</td></tr>
-        <tr data-min="180" data-max="365"><td>6–12 mois</td><td>Toutes 4–5h</td><td>4–6/j</td></tr>
-        <tr data-min="365" data-max="9999"><td>12 mois+</td><td>À la demande</td><td>3–4/j</td></tr>
+        <tr data-min="0" data-max="30"><td>0–1 mois</td><td>2–3 h</td><td>8–12</td></tr>
+        <tr data-min="30" data-max="90"><td>1–3 mois</td><td>2h30–3h30</td><td>7–9</td></tr>
+        <tr data-min="90" data-max="180"><td>3–6 mois</td><td>3–4 h</td><td>6–8</td></tr>
+        <tr data-min="180" data-max="365"><td>6–12 mois</td><td>4–5 h</td><td>4–6</td></tr>
+        <tr data-min="365" data-max="9999"><td>12 mois+</td><td>à la demande</td><td>3–4</td></tr>
       </tbody>
     </table>
   </div>
-
-  <button class="btn-save-settings" onclick="saveSettings()">💾 Sauvegarder les réglages</button>
+  <button class="save-btn-full" onclick="saveConfig()">Sauvegarder la configuration</button>
+  <button class="clear-btn-full" onclick="clearAll()">Effacer toutes les données</button>
   <br><br>
-  <button style="width:100%;padding:12px;background:none;border:1.5px solid var(--blush);border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:0.85rem;color:var(--text-light);cursor:pointer;" onclick="clearAll()">🗑️ Effacer toutes les données</button>
+</div>
 </div>
 
-<!-- APPOINTMENT MODAL -->
+<!-- MODALS -->
 <div class="modal-overlay" id="apptModal">
   <div class="modal">
-    <div class="modal-title">📅 Nouveau rendez-vous</div>
-    <div class="form-group">
-      <label class="form-label">Type de rendez-vous</label>
-      <select class="form-select" id="apptType">
-        <option value="Pédiatre">Pédiatre</option>
-        <option value="Vaccin">Vaccin</option>
-        <option value="PMI">PMI / Sage-femme</option>
-        <option value="Urgences">Urgences</option>
-        <option value="Autre">Autre</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Titre</label>
-      <input class="form-input" id="apptTitle" placeholder="Ex: Visite 1 mois">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Date</label>
-      <input class="form-input" id="apptDate" type="date">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Heure (optionnel)</label>
-      <input class="form-input" id="apptTime" type="time">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="apptNotes" placeholder="Questions à poser, documents à apporter…"></textarea>
-    </div>
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nouveau rendez-vous</div>
+    <div class="form-group"><label class="form-label">Type</label><select class="inp" id="mApptType"><option>Pédiatre</option><option>Vaccin</option><option>PMI / Sage-femme</option><option>Urgences</option><option>Autre</option></select></div>
+    <div class="form-group"><label class="form-label">Titre</label><input class="inp" id="mApptTitle" placeholder="Ex : Visite 1 mois"></div>
+    <div class="form-group"><label class="form-label">Date</label><input class="inp" id="mApptDate" type="date"></div>
+    <div class="form-group"><label class="form-label">Heure (optionnel)</label><input class="inp" id="mApptTime" type="time"></div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea class="inp" id="mApptNotes" placeholder="Questions, documents…"></textarea></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('apptModal')">Annuler</button>
-      <button class="btn-save" onclick="saveAppt()">✅ Enregistrer</button>
+      <button class="btn-confirm" onclick="saveAppt()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<!-- GROWTH MODAL -->
 <div class="modal-overlay" id="growthModal">
   <div class="modal">
-    <div class="modal-title">📊 Mesures de bébé</div>
-    <div class="form-group">
-      <label class="form-label">Poids (kg)</label>
-      <input class="form-input" id="gWeight" type="number" step="0.01" placeholder="Ex: 3.45">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Taille (cm)</label>
-      <input class="form-input" id="gHeight" type="number" step="0.1" placeholder="Ex: 51.5">
-    </div>
+    <div class="modal-handle"></div>
+    <div class="modal-title">Mesures de bébé</div>
+    <div class="form-group"><label class="form-label">Poids (kg)</label><input class="inp" id="mGWeight" type="number" step="0.01" placeholder="Ex : 3.45"></div>
+    <div class="form-group"><label class="form-label">Taille (cm)</label><input class="inp" id="mGHeight" type="number" step="0.1" placeholder="Ex : 52.5"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('growthModal')">Annuler</button>
-      <button class="btn-save" onclick="saveGrowth()">✅ Enregistrer</button>
+      <button class="btn-confirm" onclick="saveGrowth()">Enregistrer</button>
     </div>
   </div>
 </div>
 
-<!-- NOTE MODAL -->
 <div class="modal-overlay" id="noteModal">
   <div class="modal">
-    <div class="modal-title">📝 Nouvelle note</div>
-    <div class="form-group">
-      <label class="form-label">Note / observation</label>
-      <textarea class="form-textarea" id="noteText" placeholder="Ex: Bébé a souri pour la première fois, selles normales, sommeil agité…" style="min-height:100px;"></textarea>
-    </div>
+    <div class="modal-handle"></div>
+    <div class="modal-title">Note & observation</div>
+    <div class="form-group"><label class="form-label">Note</label><textarea class="inp" id="mNoteText" style="min-height:100px" placeholder="Ex : Premier sourire…"></textarea></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('noteModal')">Annuler</button>
-      <button class="btn-save" onclick="saveNote()">✅ Enregistrer</button>
+      <button class="btn-confirm" onclick="saveNote()">Enregistrer</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase compat SDK (global window.firebase) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-// ===== DATA =====
-let data = {
-  babyName: '',
-  babyDob: '',
-  feedType: 'breast',
-  alertHours: 'auto',
-  feeds: [],       // [{ts}]
-  appointments: [], // [{id, type, title, date, time, notes}]
-  growth: { weight: null, weightDate: null, height: null, heightDate: null },
-  notes: []        // [{id, ts, text}]
+// ── STATE ──────────────────────────────────────────────────────────────
+var gdb = {
+  babyName:'', babyDob:'', feedType:'breast', alertH:'auto',
+  feeds:[], appointments:[],
+  growth:{weight:null,weightDate:null,height:null,heightDate:null},
+  notes:[], firebaseConfig:null, fbUserId:null
 };
+var gFirebaseApp=null, gFbRef=null;
+var gAlarmInterval=null, gAlarmCtx=null;
+var gSessionInterval=null, gMainTimer=null;
+var gSessionStart=null;
 
-function load() {
-  const saved = localStorage.getItem('bebecare_v1');
-  if (saved) data = JSON.parse(saved);
+// ── LOCAL STORAGE ──────────────────────────────────────────────────────
+function loadLocal(){
+  try{ var s=localStorage.getItem('bebe_care_v3'); if(s) gdb=Object.assign(gdb,JSON.parse(s)); }catch(e){}
 }
-function save() {
-  localStorage.setItem('bebecare_v1', JSON.stringify(data));
-}
-
-// ===== AGE CALC =====
-function getBabyAgeDays() {
-  if (!data.babyDob) return null;
-  const dob = new Date(data.babyDob);
-  const now = new Date();
-  return Math.floor((now - dob) / 86400000);
+function saveLocal(){
+  try{ localStorage.setItem('bebe_care_v3',JSON.stringify(gdb)); }catch(e){}
 }
 
-function getAgeLabel(days) {
-  if (days === null) return 'Âge inconnu';
-  if (days < 7) return `${days} jour${days > 1 ? 's' : ''}`;
-  if (days < 30) return `${Math.floor(days/7)} semaine${Math.floor(days/7) > 1 ? 's' : ''}`;
-  if (days < 365) return `${Math.floor(days/30)} mois`;
-  return `${Math.floor(days/365)} an${Math.floor(days/365) > 1 ? 's' : ''}`;
+// ── FIREBASE ───────────────────────────────────────────────────────────
+function connectFirebase(cfg){
+  try{
+    var appName='bc'+Date.now();
+    gFirebaseApp=firebase.initializeApp(cfg,appName);
+    var fdb=gFirebaseApp.database();
+    var uid=gdb.fbUserId||('u'+Math.random().toString(36).slice(2,9));
+    gdb.fbUserId=uid; gdb.firebaseConfig=cfg; saveLocal();
+    gFbRef=fdb.ref('bebecare/'+uid);
+    gFbRef.on('value',function(snap){
+      var v=snap.val();
+      if(v){ gdb=Object.assign(gdb,v); saveLocal(); renderAll(); }
+    });
+    setSyncBadge('ok','Sync ✓');
+    showToast('🔥 Firebase connecté !');
+  }catch(e){ setSyncBadge('err','Erreur'); showToast('❌ '+e.message); }
 }
-
-function getRecommendation(days) {
-  if (days === null) return { text: 'Renseignez la date de naissance de bébé dans Réglages.', intervalH: 3 };
-  if (days < 30) return { text: '0–1 mois : allaitement à la demande, toutes les 2 à 3h. Minimum 8–12 tétées/jour. Ne pas dépasser 6h sans tétée.', intervalH: 3 };
-  if (days < 90) return { text: '1–3 mois : rythme toutes les 2h30–3h30, soit 7–9 tétées/jour. Le bébé commence à espacer légèrement la nuit.', intervalH: 3 };
-  if (days < 180) return { text: '3–6 mois : toutes les 3 à 4h, soit 6–8 tétées/jour. Des périodes nocturnes plus longues apparaissent.', intervalH: 3.5 };
-  if (days < 365) return { text: '6–12 mois : toutes les 4 à 5h, 4–6 tétées/jour. Début de diversification alimentaire en complément.', intervalH: 4.5 };
-  return { text: '12 mois+ : à la demande, 3–4 tétées/jour en complément des repas. Source OMS.', intervalH: 5 };
-}
-
-function getAlertIntervalMs() {
-  if (data.alertHours !== 'auto') {
-    return parseFloat(data.alertHours) * 3600000;
+function fbSave(){
+  if(gFbRef){
+    var d=JSON.parse(JSON.stringify(gdb));
+    delete d.firebaseConfig;
+    gFbRef.set(d).catch(function(){setSyncBadge('err','Sync ❌');});
   }
-  const days = getBabyAgeDays();
-  const { intervalH } = getRecommendation(days);
-  return intervalH * 3600000;
+  saveLocal();
+}
+function setSyncBadge(cls,txt){
+  var b=document.getElementById('syncBadge');
+  b.className='sync-badge '+cls; b.textContent=txt;
 }
 
-// ===== TIMER =====
-let timerInterval = null;
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(updateTimer, 1000);
-  updateTimer();
+// ── AGE & RECO ─────────────────────────────────────────────────────────
+function ageDays(){
+  if(!gdb.babyDob) return null;
+  return Math.floor((Date.now()-new Date(gdb.babyDob))/86400000);
+}
+function ageLabel(d){
+  if(d===null) return '—';
+  if(d<7) return d+' j';
+  if(d<30) return Math.floor(d/7)+' sem.';
+  if(d<365) return Math.floor(d/30)+' mois';
+  return Math.floor(d/365)+' an'+(Math.floor(d/365)>1?'s':'');
+}
+function recoInterval(){
+  var d=ageDays();
+  if(d===null||d<90) return 3;
+  if(d<180) return 3.5;
+  if(d<365) return 4.5;
+  return 5;
+}
+function recoText(){
+  var d=ageDays();
+  if(d===null) return 'Configurez la date de naissance dans Config.';
+  if(d<30)  return '0–1 mois · À la demande, toutes 2–3h, 8–12 fois/jour. Max 6h sans tétée.';
+  if(d<90)  return '1–3 mois · Toutes 2h30–3h30, 7–9 fois/jour. Nuits légèrement plus longues.';
+  if(d<180) return '3–6 mois · Toutes 3–4h, 6–8 fois/jour. Sommeil nocturne se consolide.';
+  if(d<365) return '6–12 mois · Toutes 4–5h, 4–6 fois/jour. Diversification en complément.';
+  return '12 mois+ · À la demande, 3–4 fois/jour en complément des repas.';
+}
+function alertMs(){
+  var h=gdb.alertH==='auto'?recoInterval():parseFloat(gdb.alertH);
+  return h*3600000;
 }
 
-function updateTimer() {
-  const display = document.getElementById('timerDisplay');
-  const sub = document.getElementById('timerSub');
-  const alertBanner = document.getElementById('alertBanner');
-
-  if (!data.feeds.length) {
-    display.textContent = '--:--';
-    display.className = 'timer-display ok';
-    sub.textContent = 'Aucune tétée enregistrée';
-    alertBanner.classList.remove('show');
-    return;
+// ── ALARM ──────────────────────────────────────────────────────────────
+function startAlarm(){
+  document.getElementById('alertBand').classList.add('show');
+  if(!gAlarmCtx){
+    try{gAlarmCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
   }
-
-  const last = data.feeds[0].ts;
-  const elapsed = Date.now() - last;
-  const alertInterval = getAlertIntervalMs();
-  const ratio = elapsed / alertInterval;
-
-  const h = Math.floor(elapsed / 3600000);
-  const m = Math.floor((elapsed % 3600000) / 60000);
-  const s = Math.floor((elapsed % 60000) / 1000);
-
-  if (h < 10) {
-    display.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  } else {
-    display.textContent = `${h}h${String(m).padStart(2,'0')}`;
-  }
-
-  const lastDate = new Date(last);
-  sub.textContent = `Dernière tétée : ${lastDate.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
-
-  if (ratio < 0.75) {
-    display.className = 'timer-display ok';
-    alertBanner.classList.remove('show');
-  } else if (ratio < 1) {
-    display.className = 'timer-display warn';
-    alertBanner.classList.remove('show');
-  } else {
-    display.className = 'timer-display alert';
-    alertBanner.classList.add('show');
-  }
+  playBeep(); gAlarmInterval=setInterval(playBeep,3500);
+  if('vibrate' in navigator) navigator.vibrate([600,200,600,200,600]);
 }
-
-// ===== FEED =====
-function logFeed() {
-  data.feeds.unshift({ ts: Date.now() });
-  // Keep max 50
-  if (data.feeds.length > 50) data.feeds = data.feeds.slice(0, 50);
-  save();
-  updateTimer();
-  renderHistory();
-  showToast('🤱 Tétée enregistrée !');
-
-  // Browser notification
-  if ('Notification' in window && Notification.permission === 'granted') {
-    // Schedule next
-    const interval = getAlertIntervalMs();
-    setTimeout(() => {
-      new Notification('🍼 BébéCare', { body: "Il est l'heure de la tétée de bébé !", icon: '' });
-    }, interval);
-  } else if ('Notification' in window && Notification.permission !== 'denied') {
-    Notification.requestPermission();
-  }
+function stopAlarm(){
+  document.getElementById('alertBand').classList.remove('show');
+  clearInterval(gAlarmInterval); gAlarmInterval=null;
 }
-
-function deleteFeed(idx) {
-  if (confirm('Supprimer cette tétée ?')) {
-    data.feeds.splice(idx, 1);
-    save();
-    updateTimer();
-    renderHistory();
-  }
-}
-
-function renderHistory() {
-  const list = document.getElementById('historyList');
-  const today = new Date();
-  const todayStr = today.toDateString();
-  const todayFeeds = data.feeds.filter(f => new Date(f.ts).toDateString() === todayStr);
-
-  if (!todayFeeds.length) {
-    list.innerHTML = '<div class="empty-state"><span class="empty-icon">🍼</span>Aucune tétée enregistrée aujourd\'hui</div>';
-    return;
-  }
-
-  list.innerHTML = todayFeeds.map((f, i) => {
-    const d = new Date(f.ts);
-    const globalIdx = data.feeds.indexOf(f);
-    const elapsed = Date.now() - f.ts;
-    const h = Math.floor(elapsed / 3600000);
-    const m = Math.floor((elapsed % 3600000) / 60000);
-    const agoStr = h > 0 ? `il y a ${h}h${m > 0 ? m+'m' : ''}` : `il y a ${m}m`;
-    return `<div class="history-item">
-      <div>
-        <div class="history-time">${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
-        <div class="history-date">${d.toLocaleDateString('fr-FR')}</div>
-      </div>
-      <div class="history-ago">${agoStr}</div>
-      <button class="btn-delete-feed" onclick="deleteFeed(${globalIdx})">✕</button>
-    </div>`;
-  }).join('');
-}
-
-// ===== APPOINTMENTS =====
-let apptFilter = 'all';
-
-function openApptModal() {
-  document.getElementById('apptTitle').value = '';
-  document.getElementById('apptNotes').value = '';
-  document.getElementById('apptTime').value = '';
-  document.getElementById('apptDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('apptModal').classList.add('open');
-}
-
-function saveAppt() {
-  const title = document.getElementById('apptTitle').value.trim();
-  const date = document.getElementById('apptDate').value;
-  if (!title || !date) { showToast('⚠️ Titre et date obligatoires'); return; }
-  data.appointments.push({
-    id: Date.now(),
-    type: document.getElementById('apptType').value,
-    title,
-    date,
-    time: document.getElementById('apptTime').value,
-    notes: document.getElementById('apptNotes').value.trim()
+function playBeep(){
+  if(!gAlarmCtx) return;
+  [880,1046,1318,1046,880].forEach(function(f,i){
+    var o=gAlarmCtx.createOscillator(), g=gAlarmCtx.createGain();
+    o.connect(g); g.connect(gAlarmCtx.destination);
+    o.frequency.value=f; o.type='sine';
+    var t=gAlarmCtx.currentTime+i*0.15;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.25,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    o.start(t); o.stop(t+0.4);
   });
-  data.appointments.sort((a,b) => a.date.localeCompare(b.date));
-  save();
-  closeModal('apptModal');
-  renderAppts();
-  showToast('📅 Rendez-vous ajouté !');
 }
 
-function deleteAppt(id) {
-  if (confirm('Supprimer ce rendez-vous ?')) {
-    data.appointments = data.appointments.filter(a => a.id !== id);
-    save();
-    renderAppts();
+// ── FEED SESSION ───────────────────────────────────────────────────────
+function startFeed(){
+  if(gSessionStart) return;
+  gSessionStart=Date.now();
+  document.getElementById('btnStart').disabled=true;
+  document.getElementById('btnEnd').disabled=false;
+  document.getElementById('sessionStatus').classList.add('show');
+  stopAlarm();
+  gSessionInterval=setInterval(tickSession,1000); tickSession();
+  showToast('▶ Tétée démarrée');
+}
+function endFeed(){
+  if(!gSessionStart) return;
+  var end=Date.now();
+  gdb.feeds.unshift({id:end,startTs:gSessionStart,endTs:end});
+  if(gdb.feeds.length>100) gdb.feeds=gdb.feeds.slice(0,100);
+  fbSave();
+  gSessionStart=null;
+  clearInterval(gSessionInterval);
+  document.getElementById('sessionStatus').classList.remove('show');
+  document.getElementById('sessionLive').textContent='';
+  document.getElementById('btnStart').disabled=false;
+  document.getElementById('btnEnd').disabled=true;
+  renderFeedHistory();
+  showToast('⏹ Tétée enregistrée');
+}
+function tickSession(){
+  if(!gSessionStart) return;
+  var e=Date.now()-gSessionStart;
+  var m=Math.floor(e/60000),s=Math.floor((e%60000)/1000);
+  document.getElementById('sessionLive').textContent=' · '+p2(m)+':'+p2(s);
+}
+function p2(n){ return n<10?'0'+n:''+n; }
+
+// ── MAIN TIMER ─────────────────────────────────────────────────────────
+function startMainTimer(){
+  clearInterval(gMainTimer);
+  gMainTimer=setInterval(tickTimer,1000); tickTimer();
+}
+function tickTimer(){
+  var vEl=document.getElementById('timerVal');
+  var sEl=document.getElementById('timerSub');
+  var pr=document.getElementById('timerProgress');
+  var done=gdb.feeds.filter(function(f){return f.endTs;});
+  if(!done.length){
+    vEl.textContent='—'; sEl.textContent='aucune tétée';
+    pr.style.strokeDashoffset=439.8; return;
   }
+  var last=done[0].endTs;
+  var el=Date.now()-last;
+  var am=alertMs();
+  var ratio=Math.min(el/am,1);
+  pr.style.strokeDashoffset=439.8*(1-ratio);
+  var h=Math.floor(el/3600000),m=Math.floor((el%3600000)/60000),s=Math.floor((el%60000)/1000);
+  vEl.textContent=h>0?h+'h'+p2(m):p2(m)+':'+p2(s);
+  sEl.textContent='fin à '+new Date(last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  pr.style.stroke=ratio<0.75?'var(--sage)':(ratio<1?'var(--gold)':'var(--rose)');
+  if(ratio>=1&&!gAlarmInterval&&!gSessionStart) startAlarm();
 }
 
-function filterAppt(f, btn) {
-  apptFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAppts();
-}
-
-function renderAppts() {
-  const list = document.getElementById('apptList');
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
-  let appts = [...data.appointments];
-  if (apptFilter === 'upcoming') appts = appts.filter(a => a.date >= today);
-  if (apptFilter === 'past') appts = appts.filter(a => a.date < today);
-
-  if (!appts.length) {
-    list.innerHTML = '<div class="empty-state"><span class="empty-icon">📅</span>Aucun rendez-vous</div>';
-    return;
-  }
-
-  list.innerHTML = appts.map(a => {
-    const d = new Date(a.date + 'T12:00:00');
-    const day = d.getDate();
-    const month = d.toLocaleDateString('fr-FR', {month:'short'}).replace('.','');
-    let cls = '';
-    if (a.date < today) cls = 'past';
-    else if (a.date === today) cls = 'today';
-    else if (a.date === tomorrow) cls = 'soon';
-
-    const typeColors = { Pédiatre: '🩺', Vaccin: '💉', PMI: '👩‍⚕️', Urgences: '🚨', Autre: '📌' };
-    return `<div class="appt-card ${cls}">
-      <div class="appt-date-block">
-        <div class="appt-day">${day}</div>
-        <div class="appt-month">${month}</div>
-      </div>
-      <div class="appt-info">
-        <div class="appt-type">${typeColors[a.type] || '📌'} ${a.type}</div>
-        <div class="appt-title">${a.title}</div>
-        ${a.time ? `<div class="appt-time">⏰ ${a.time}</div>` : ''}
-        ${a.notes ? `<div class="appt-notes">${a.notes}</div>` : ''}
-      </div>
-      <button class="btn-del-appt" onclick="deleteAppt(${a.id})">🗑️</button>
-    </div>`;
+// ── RENDER FEED ────────────────────────────────────────────────────────
+function renderFeedHistory(){
+  var card=document.getElementById('feedHistCard');
+  var today=new Date().toDateString();
+  var tf=gdb.feeds.filter(function(f){return new Date(f.startTs).toDateString()===today;});
+  if(!tf.length){ card.innerHTML='<div class="empty"><span class="empty-icon">🍼</span>Aucune tétée aujourd\'hui</div>'; return; }
+  card.innerHTML=tf.map(function(f){
+    var ss=new Date(f.startTs).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    var es=f.endTs?new Date(f.endTs).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'…';
+    var dur=f.endTs?Math.round((f.endTs-f.startTs)/60000)+' min':'';
+    return '<div class="hist-item">'+
+      '<div class="hist-dot'+(f.endTs?' ended':'')+'"></div>'+
+      '<div class="hist-info">'+
+        '<div class="hist-time">'+ss+' → '+es+'</div>'+
+        '<div class="hist-meta"><span>'+new Date(f.startTs).toLocaleDateString('fr-FR')+'</span>'+(dur?'<span class="hist-dur">'+dur+'</span>':'')+'</div>'+
+      '</div>'+
+      '<button class="btn-del" onclick="delFeed('+f.id+')">✕</button>'+
+    '</div>';
   }).join('');
 }
-
-// ===== GROWTH =====
-function openGrowthModal() {
-  document.getElementById('gWeight').value = data.growth.weight || '';
-  document.getElementById('gHeight').value = data.growth.height || '';
-  document.getElementById('growthModal').classList.add('open');
-}
-function saveGrowth() {
-  const w = parseFloat(document.getElementById('gWeight').value);
-  const h = parseFloat(document.getElementById('gHeight').value);
-  const dateStr = new Date().toLocaleDateString('fr-FR');
-  if (!isNaN(w)) { data.growth.weight = w; data.growth.weightDate = dateStr; }
-  if (!isNaN(h)) { data.growth.height = h; data.growth.heightDate = dateStr; }
-  save();
-  closeModal('growthModal');
-  renderGrowth();
-  showToast('📊 Mesures mises à jour !');
-}
-function renderGrowth() {
-  document.getElementById('statWeight').textContent = data.growth.weight ? data.growth.weight.toFixed(2) : '—';
-  document.getElementById('statWeightDate').textContent = data.growth.weightDate ? data.growth.weightDate : '';
-  document.getElementById('statHeight').textContent = data.growth.height ? data.growth.height.toFixed(1) : '—';
-  document.getElementById('statHeightDate').textContent = data.growth.heightDate ? data.growth.heightDate : '';
+function delFeed(id){
+  gdb.feeds=gdb.feeds.filter(function(f){return f.id!==id;});
+  fbSave(); renderFeedHistory();
 }
 
-// ===== NOTES =====
-function openNoteModal() {
-  document.getElementById('noteText').value = '';
-  document.getElementById('noteModal').classList.add('open');
+// ── APPOINTMENTS ───────────────────────────────────────────────────────
+function saveAppt(){
+  var t=document.getElementById('mApptTitle').value.trim();
+  var d=document.getElementById('mApptDate').value;
+  if(!t||!d){showToast('Titre et date requis');return;}
+  gdb.appointments.push({id:Date.now(),type:document.getElementById('mApptType').value,title:t,date:d,time:document.getElementById('mApptTime').value,notes:document.getElementById('mApptNotes').value.trim()});
+  gdb.appointments.sort(function(a,b){return a.date.localeCompare(b.date);});
+  fbSave(); closeModal('apptModal'); renderAppts(); showToast('📅 Rendez-vous ajouté');
 }
-function saveNote() {
-  const text = document.getElementById('noteText').value.trim();
-  if (!text) return;
-  data.notes.unshift({ id: Date.now(), ts: Date.now(), text });
-  save();
-  closeModal('noteModal');
-  renderNotes();
-  showToast('📝 Note enregistrée !');
+function renderAppts(){
+  var card=document.getElementById('apptListCard');
+  if(!gdb.appointments.length){card.innerHTML='<div class="empty"><span class="empty-icon">📅</span>Aucun rendez-vous</div>';return;}
+  var today=new Date().toISOString().split('T')[0];
+  var ico={Pédiatre:'🩺',Vaccin:'💉','PMI / Sage-femme':'👩‍⚕️',Urgences:'🚨',Autre:'📌'};
+  card.innerHTML=gdb.appointments.map(function(a){
+    var d=new Date(a.date+'T12:00:00');
+    var cls=a.date<today?'past':(a.date===today?'today':'');
+    return '<div class="appt-item '+cls+'">'+
+      '<div class="appt-date-col"><div class="appt-dd">'+d.getDate()+'</div><div class="appt-mm">'+d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')+'</div></div>'+
+      '<div class="appt-body"><span class="appt-type-tag">'+(ico[a.type]||'📌')+' '+a.type+'</span><div class="appt-title-t">'+a.title+'</div>'+(a.time?'<div class="appt-when">⏰ '+a.time+'</div>':'')+(a.notes?'<div class="appt-notes-t">'+a.notes+'</div>':'')+'</div>'+
+      '<button class="btn-del" onclick="delAppt('+a.id+')">✕</button>'+
+    '</div>';
+  }).join('');
 }
-function deleteNote(id) {
-  data.notes = data.notes.filter(n => n.id !== id);
-  save();
-  renderNotes();
+function delAppt(id){gdb.appointments=gdb.appointments.filter(function(a){return a.id!==id;});fbSave();renderAppts();}
+
+// ── GROWTH ─────────────────────────────────────────────────────────────
+function saveGrowth(){
+  var w=parseFloat(document.getElementById('mGWeight').value);
+  var h=parseFloat(document.getElementById('mGHeight').value);
+  var dt=new Date().toLocaleDateString('fr-FR');
+  if(!isNaN(w)){gdb.growth.weight=w;gdb.growth.weightDate=dt;}
+  if(!isNaN(h)){gdb.growth.height=h;gdb.growth.heightDate=dt;}
+  fbSave(); closeModal('growthModal'); renderGrowth(); showToast('📊 Mesures mises à jour');
 }
-function renderNotes() {
-  const list = document.getElementById('notesList');
-  if (!data.notes.length) {
-    list.innerHTML = '<div class="empty-state"><span class="empty-icon">📒</span>Aucune note</div>';
-    return;
+function renderGrowth(){
+  document.getElementById('gvWeight').textContent=gdb.growth.weight?gdb.growth.weight.toFixed(2):'—';
+  document.getElementById('gdWeight').textContent=gdb.growth.weightDate||'';
+  document.getElementById('gvHeight').textContent=gdb.growth.height?gdb.growth.height.toFixed(1):'—';
+  document.getElementById('gdHeight').textContent=gdb.growth.heightDate||'';
+}
+
+// ── NOTES ──────────────────────────────────────────────────────────────
+function saveNote(){
+  var t=document.getElementById('mNoteText').value.trim();
+  if(!t) return;
+  gdb.notes.unshift({id:Date.now(),ts:Date.now(),text:t});
+  fbSave(); closeModal('noteModal'); renderNotes(); showToast('📝 Note enregistrée');
+}
+function renderNotes(){
+  var c=document.getElementById('notesCard');
+  if(!gdb.notes.length){c.innerHTML='<div class="empty"><span class="empty-icon">📒</span>Aucune note</div>';return;}
+  c.innerHTML=gdb.notes.map(function(n){
+    return '<div class="note-item">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+        '<div class="note-when">'+new Date(n.ts).toLocaleDateString('fr-FR')+' · '+new Date(n.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div>'+
+        '<button class="btn-del" onclick="delNote('+n.id+')">✕</button>'+
+      '</div>'+
+      '<div class="note-body">'+n.text+'</div>'+
+    '</div>';
+  }).join('');
+}
+function delNote(id){gdb.notes=gdb.notes.filter(function(n){return n.id!==id;});fbSave();renderNotes();}
+
+// ── CONFIG ─────────────────────────────────────────────────────────────
+function saveConfig(){
+  gdb.babyName=document.getElementById('cfgName').value.trim();
+  gdb.babyDob=document.getElementById('cfgDob').value;
+  gdb.feedType=document.getElementById('cfgFeed').value;
+  gdb.alertH=document.getElementById('cfgAlert').value;
+  fbSave(); updateHeader(); renderAll(); showToast('✅ Configuration sauvegardée');
+}
+function saveFirebase(){
+  var k=document.getElementById('fbApiKey').value.trim();
+  var p=document.getElementById('fbProjectId').value.trim();
+  var a=document.getElementById('fbAppId').value.trim();
+  if(!k||!p||!a){showToast('Remplissez tous les champs Firebase');return;}
+  connectFirebase({apiKey:k,authDomain:p+'.firebaseapp.com',databaseURL:'https://'+p+'-default-rtdb.firebaseio.com',projectId:p,appId:a});
+}
+function loadConfig(){
+  document.getElementById('cfgName').value=gdb.babyName||'';
+  document.getElementById('cfgDob').value=gdb.babyDob||'';
+  document.getElementById('cfgFeed').value=gdb.feedType||'breast';
+  document.getElementById('cfgAlert').value=gdb.alertH||'auto';
+  if(gdb.firebaseConfig){
+    document.getElementById('fbApiKey').value=gdb.firebaseConfig.apiKey||'';
+    document.getElementById('fbProjectId').value=gdb.firebaseConfig.projectId||'';
+    document.getElementById('fbAppId').value=gdb.firebaseConfig.appId||'';
   }
-  list.innerHTML = data.notes.map(n => `
-    <div class="note-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div class="note-date">${new Date(n.ts).toLocaleDateString('fr-FR')} – ${new Date(n.ts).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</div>
-        <button style="background:none;border:none;cursor:pointer;color:var(--rose);opacity:0.5;" onclick="deleteNote(${n.id})">✕</button>
-      </div>
-      <div class="note-text">${n.text}</div>
-    </div>
-  `).join('');
+}
+function clearAll(){
+  if(!confirm('Effacer TOUTES les données ?')) return;
+  var fc=gdb.firebaseConfig,fi=gdb.fbUserId;
+  gdb={babyName:'',babyDob:'',feedType:'breast',alertH:'auto',feeds:[],appointments:[],growth:{weight:null,weightDate:null,height:null,heightDate:null},notes:[],firebaseConfig:fc,fbUserId:fi};
+  fbSave(); renderAll(); showToast('🗑️ Données effacées');
 }
 
-// ===== SETTINGS =====
-function loadSettings() {
-  document.getElementById('setBabyName').value = data.babyName || '';
-  document.getElementById('setBabyDob').value = data.babyDob || '';
-  document.getElementById('setFeedType').value = data.feedType || 'breast';
-  document.getElementById('setAlertHours').value = data.alertHours || 'auto';
-}
-
-function saveSettings() {
-  data.babyName = document.getElementById('setBabyName').value.trim();
-  data.babyDob = document.getElementById('setBabyDob').value;
-  data.feedType = document.getElementById('setFeedType').value;
-  data.alertHours = document.getElementById('setAlertHours').value;
-  save();
-  updateHeader();
-  updateReco();
-  highlightCurrentAge();
-  showToast('✅ Réglages sauvegardés !');
-}
-
-function updateHeader() {
-  const days = getBabyAgeDays();
-  const name = data.babyName || 'Bébé';
-  const ageLabel = getAgeLabel(days);
-  document.getElementById('ageBadge').textContent = `${name} · ${ageLabel}`;
-  document.title = `🍼 ${name} · BébéCare`;
-}
-
-function updateReco() {
-  const days = getBabyAgeDays();
-  const { text } = getRecommendation(days);
-  document.getElementById('recoText').textContent = text;
-}
-
-function highlightCurrentAge() {
-  const days = getBabyAgeDays();
-  if (days === null) return;
-  document.querySelectorAll('#freqTable tbody tr').forEach(row => {
-    row.classList.remove('current-age');
-    // Remove old badges
-    row.querySelectorAll('.current-badge').forEach(b => b.remove());
-    const min = parseInt(row.dataset.min);
-    const max = parseInt(row.dataset.max);
-    if (days >= min && days < max) {
-      row.classList.add('current-age');
-      row.cells[0].innerHTML += '<span class="current-badge">✓ Maintenant</span>';
+// ── HEADER ─────────────────────────────────────────────────────────────
+function updateHeader(){
+  var d=ageDays(), name=gdb.babyName||'Bébé';
+  document.getElementById('ageBadge').textContent=name+' · '+ageLabel(d);
+  document.getElementById('recoText').textContent=recoText();
+  document.querySelectorAll('#freqTable tbody tr').forEach(function(row){
+    row.classList.remove('cur');
+    row.querySelectorAll('.cur-badge').forEach(function(b){b.remove();});
+    if(d!==null&&d>=+row.dataset.min&&d<+row.dataset.max){
+      row.classList.add('cur');
+      row.cells[0].innerHTML+='<span class="cur-badge">✓</span>';
     }
   });
 }
 
-// ===== MODAL =====
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-// Close on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
-});
-
-// ===== TABS =====
-function switchTab(tab, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
+// ── TABS / MODALS / TOAST ──────────────────────────────────────────────
+function switchTab(tab,btn){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
+  document.querySelector('.scroll-area').scrollTop=0;
+}
+function openModal(id){
+  if(id==='apptModal'){document.getElementById('mApptTitle').value='';document.getElementById('mApptNotes').value='';document.getElementById('mApptTime').value='';document.getElementById('mApptDate').value=new Date().toISOString().split('T')[0];}
+  if(id==='growthModal'){document.getElementById('mGWeight').value=gdb.growth.weight||'';document.getElementById('mGHeight').value=gdb.growth.height||'';}
+  if(id==='noteModal') document.getElementById('mNoteText').value='';
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(function(o){
+  o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});
+});
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
 }
 
-// ===== TOAST =====
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+// ── RENDER ALL ─────────────────────────────────────────────────────────
+function renderAll(){
+  updateHeader(); renderFeedHistory(); renderAppts(); renderGrowth(); renderNotes(); loadConfig();
 }
 
-// ===== CLEAR ALL =====
-function clearAll() {
-  if (confirm('⚠️ Effacer TOUTES les données ? Cette action est irréversible.')) {
-    localStorage.removeItem('bebecare_v1');
-    data = { babyName:'', babyDob:'', feedType:'breast', alertHours:'auto', feeds:[], appointments:[], growth:{weight:null,weightDate:null,height:null,heightDate:null}, notes:[] };
-    renderAll();
-    showToast('🗑️ Données effacées');
-  }
-}
-
-// ===== INIT =====
-function renderAll() {
-  updateHeader();
-  updateReco();
-  highlightCurrentAge();
-  renderHistory();
-  renderAppts();
-  renderGrowth();
-  renderNotes();
-  loadSettings();
-}
-
-load();
+// ── INIT ───────────────────────────────────────────────────────────────
+loadLocal();
 renderAll();
-startTimer();
-
-// Update age every minute
-setInterval(() => {
-  updateHeader();
-  updateReco();
-}, 60000);
+startMainTimer();
+if(gdb.firebaseConfig){
+  setSyncBadge('ok','Firebase');
+  try{connectFirebase(gdb.firebaseConfig);}catch(e){setSyncBadge('err','Erreur');}
+}
+setInterval(function(){updateHeader();},60000);
+if('Notification' in window&&Notification.permission==='default') Notification.requestPermission();
 </script>
 </body>
 </html>
