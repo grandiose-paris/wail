@@ -2,680 +2,1136 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BébéCare</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ivory:#faf7f2;--ivory2:#f3ede4;--ivory3:#ebe3d6;
-    --sand:#d6c9b4;--sand2:#bfaf97;
-    --gold:#c8a96e;--gold2:#a8884e;
-    --rose:#c4877a;--rose2:#a3665a;
-    --sage:#7a9e8a;--sage2:#5c8070;
-    --charcoal:#2c2520;--charcoal2:#3d3128;
-    --text:#2c2520;--text2:#6b5c4e;--text3:#9c8a7a;
-    --r:16px;--rs:10px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;overflow:hidden;}
-  body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--text);display:flex;flex-direction:column;height:100dvh;}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Wail 🍼 — Suivi Bébé</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
 
-  .header{background:var(--charcoal2);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;}
-  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-  .header-brand{display:flex;align-items:baseline;gap:6px;}
-  .header-logo{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:500;color:var(--ivory);letter-spacing:1px;}
-  .header-logo span{color:var(--gold);font-style:italic;}
-  .header-sep{width:1px;height:16px;background:rgba(200,169,110,.35);}
-  .header-age{font-size:.72rem;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--sand);}
-
-  .tabs{display:flex;background:var(--charcoal);flex-shrink:0;}
-  .tab-btn{flex:1;border:none;background:none;padding:11px 4px 9px;color:var(--sand2);font-family:'Jost',sans-serif;font-size:.65rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;transition:color .2s;}
-  .tab-btn .ti{font-size:1.1rem;}
-  .tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:2px;width:0;background:var(--gold);transition:width .25s;}
-  .tab-btn.active{color:var(--gold);}
-  .tab-btn.active::after{width:28px;}
-
-  .scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
-  .section{display:none;padding:20px 16px 30px;}
-  .section.active{display:block;}
-
-  .card{background:#fff;border-radius:var(--r);padding:20px;margin-bottom:14px;border:1px solid var(--ivory3);position:relative;overflow:hidden;}
-  .card-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2));}
-
-  .sec-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--text);letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--sand),transparent);}
-
-  .timer-ring{display:flex;flex-direction:column;align-items:center;padding:10px 0 16px;}
-  .timer-label{font-size:.65rem;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
-  .timer-circle{position:relative;width:160px;height:160px;}
-  .timer-svg{position:absolute;inset:0;transform:rotate(-90deg);}
-  .timer-track{stroke:var(--ivory3);fill:none;stroke-width:4;}
-  .timer-progress{fill:none;stroke-width:4;stroke-linecap:round;stroke-dasharray:439.8;stroke-dashoffset:439.8;transition:stroke-dashoffset .5s,stroke .5s;}
-  .timer-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
-  .timer-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:500;color:var(--text);letter-spacing:-1px;line-height:1;}
-  .timer-sub{font-size:.68rem;font-weight:300;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);}
-
-  .alert-band{background:var(--rose);border-radius:var(--rs);padding:12px 16px;display:none;align-items:center;gap:10px;margin-bottom:14px;}
-  .alert-band.show{display:flex;animation:pulseBg 1.4s ease-in-out infinite;}
-  @keyframes pulseBg{0%,100%{background:var(--rose)}50%{background:var(--rose2)}}
-  .alert-band-icon{font-size:1.3rem;flex-shrink:0;}
-  .alert-band-text{font-size:.85rem;font-weight:500;color:#fff;line-height:1.3;}
-  .btn-stop-alarm{margin-left:auto;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);border-radius:20px;color:#fff;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:1px;padding:5px 12px;cursor:pointer;white-space:nowrap;}
-
-  .session-status{background:linear-gradient(135deg,#e8f5ee,#dff0e6);border:1px solid var(--sage);border-radius:var(--rs);padding:12px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px;}
-  .session-status.show{display:flex;}
-  .session-dot{width:10px;height:10px;border-radius:50%;background:var(--sage2);animation:pulseDot 1.2s ease-in-out infinite;flex-shrink:0;}
-  @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
-  .session-text{font-size:.82rem;font-weight:500;color:var(--sage2);}
-  .session-live{font-weight:600;margin-left:4px;color:var(--sage);}
-
-  .btn-row{display:flex;gap:10px;}
-  .btn-primary{flex:1;padding:15px 12px;background:linear-gradient(135deg,var(--charcoal2),var(--charcoal));color:var(--ivory);border:1px solid rgba(200,169,110,.3);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s;}
-  .btn-primary .bi{font-size:1.3rem;}
-  .btn-primary:active{transform:scale(.97);}
-  .btn-primary.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:var(--gold);color:var(--charcoal);}
-  .btn-primary:disabled{opacity:.4;pointer-events:none;}
-
-  .reco-box{background:var(--ivory2);border-left:3px solid var(--gold);border-radius:0 var(--rs) var(--rs) 0;padding:12px 14px;margin-bottom:14px;}
-  .reco-box-title{font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:5px;}
-  .reco-box-text{font-size:.82rem;color:var(--text2);line-height:1.5;}
-
-  .hist-item{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--ivory3);gap:12px;animation:fadeIn .3s ease;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-  .hist-item:last-child{border-bottom:none;}
-  .hist-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;}
-  .hist-dot.ended{background:var(--sage);}
-  .hist-info{flex:1;}
-  .hist-time{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--text);line-height:1;}
-  .hist-meta{font-size:.72rem;color:var(--text3);margin-top:2px;display:flex;gap:8px;}
-  .hist-dur{color:var(--sage2);font-weight:500;}
-  .btn-del{background:none;border:none;color:var(--sand2);cursor:pointer;font-size:.9rem;padding:4px 6px;border-radius:6px;}
-
-  .appt-item{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--ivory3);}
-  .appt-item:last-child{border-bottom:none;}
-  .appt-date-col{text-align:center;min-width:44px;background:var(--ivory2);border-radius:var(--rs);padding:8px 6px;border:1px solid var(--ivory3);}
-  .appt-dd{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:500;color:var(--text);line-height:1;}
-  .appt-mm{font-size:.6rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:1px;}
-  .appt-body{flex:1;}
-  .appt-type-tag{font-size:.6rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold2);margin-bottom:4px;display:block;}
-  .appt-title-t{font-size:.9rem;font-weight:500;color:var(--text);}
-  .appt-when{font-size:.75rem;color:var(--text3);margin-top:3px;}
-  .appt-notes-t{font-size:.75rem;color:var(--text2);margin-top:4px;font-style:italic;line-height:1.4;}
-  .appt-item.today{background:linear-gradient(90deg,rgba(200,169,110,.06),transparent);}
-  .appt-item.past .appt-dd,.appt-item.past .appt-title-t{color:var(--text3);}
-
-  .growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-  .growth-stat{background:var(--ivory2);border-radius:var(--rs);padding:14px 12px;text-align:center;border:1px solid var(--ivory3);}
-  .gs-icon{font-size:1.2rem;margin-bottom:6px;}
-  .gs-val{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:500;color:var(--text);line-height:1;}
-  .gs-unit{font-size:.72rem;color:var(--text3);}
-  .gs-label{font-size:.6rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:4px;}
-  .gs-date{font-size:.68rem;color:var(--sand2);margin-top:2px;}
-
-  .note-item{padding:12px 0;border-bottom:1px solid var(--ivory3);}
-  .note-item:last-child{border-bottom:none;}
-  .note-when{font-size:.7rem;font-weight:500;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:5px;}
-  .note-body{font-size:.85rem;color:var(--text);line-height:1.5;}
-
-  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--ivory3);gap:12px;}
-  .setting-row:last-child{border-bottom:none;}
-  .setting-label{font-size:.85rem;font-weight:500;color:var(--text);}
-  .setting-sub{font-size:.72rem;color:var(--text3);margin-top:2px;}
-  .inp{border:1px solid var(--ivory3);border-radius:var(--rs);padding:9px 12px;font-family:'Jost',sans-serif;font-size:.88rem;color:var(--text);background:var(--ivory);transition:border-color .2s;width:100%;}
-  .inp:focus{outline:none;border-color:var(--gold);}
-  .inp-sm{width:auto;min-width:110px;text-align:center;}
-
-  .freq-table{width:100%;font-size:.78rem;border-collapse:collapse;}
-  .freq-table th{background:var(--ivory2);padding:8px 10px;font-size:.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--ivory3);}
-  .freq-table td{padding:9px 10px;border-bottom:1px solid var(--ivory3);color:var(--text);}
-  .freq-table tr.cur td{color:var(--sage2);font-weight:600;background:rgba(122,158,138,.06);}
-  .cur-badge{display:inline-block;background:var(--sage);color:#fff;font-size:.55rem;font-weight:600;letter-spacing:1px;padding:2px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;}
-
-  .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,37,32,.55);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--ivory);border-radius:22px 22px 0 0;padding:6px 20px 34px;width:100%;max-width:500px;max-height:90dvh;overflow-y:auto;animation:slideUp .28s cubic-bezier(.32,.72,0,1);}
-  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .modal-handle{width:36px;height:4px;background:var(--sand);border-radius:2px;margin:10px auto 18px;}
-  .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--text);margin-bottom:18px;}
-  .form-group{margin-bottom:14px;}
-  .form-label{display:block;font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
-  textarea.inp{resize:vertical;min-height:72px;}
-  .modal-actions{display:flex;gap:10px;margin-top:20px;}
-  .btn-cancel{flex:1;padding:13px;background:var(--ivory3);border:none;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:1px;color:var(--text2);cursor:pointer;}
-  .btn-confirm{flex:2;padding:13px;background:linear-gradient(135deg,var(--charcoal2),var(--charcoal));border:1px solid rgba(200,169,110,.3);border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ivory);cursor:pointer;}
-
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:var(--ivory);padding:10px 20px;border-radius:30px;font-size:.82rem;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(200,169,110,.25);white-space:nowrap;}
-  .toast.show{opacity:1;}
-
-  .sync-badge{font-size:.6rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;background:rgba(200,169,110,.15);color:var(--gold2);border:1px solid rgba(200,169,110,.3);}
-  .sync-badge.ok{background:rgba(122,158,138,.15);color:var(--sage2);border-color:rgba(122,158,138,.3);}
-  .sync-badge.err{background:rgba(196,135,122,.15);color:var(--rose2);border-color:rgba(196,135,122,.3);}
-
-  .btn-add{width:100%;padding:13px;background:none;border:1px dashed var(--sand);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);cursor:pointer;margin-bottom:16px;transition:all .2s;}
-  .empty{text-align:center;padding:30px 0;color:var(--text3);font-size:.82rem;}
-  .empty-icon{font-size:2rem;display:block;margin-bottom:10px;opacity:.4;}
-
-  .firebase-setup{background:linear-gradient(135deg,#1a1410,#2c2218);border-radius:var(--r);padding:20px;margin-bottom:14px;border:1px solid rgba(200,169,110,.2);}
-  .firebase-setup-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);margin-bottom:12px;}
-  .firebase-setup p{font-size:.78rem;color:var(--sand2);line-height:1.6;margin-bottom:12px;}
-  .firebase-setup .inp{background:rgba(255,255,255,.07);border-color:rgba(200,169,110,.25);color:var(--ivory);font-size:.78rem;}
-  .firebase-setup .inp::placeholder{color:rgba(200,180,150,.35);}
-  .firebase-setup-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--charcoal);cursor:pointer;margin-top:10px;}
-  .save-btn-full{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--charcoal);cursor:pointer;margin-bottom:10px;}
-  .clear-btn-full{width:100%;padding:12px;background:none;border:1px solid var(--ivory3);border-radius:var(--r);font-family:'Jost',sans-serif;font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);cursor:pointer;}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div class="header-brand">
-    <div class="header-logo">Bébé<span>Care</span></div>
-    <div class="header-sep"></div>
-    <div class="header-age" id="ageBadge">—</div>
-  </div>
-  <div class="sync-badge" id="syncBadge">Local</div>
-</div>
-
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('feed',this)"><span class="ti">🍼</span>Tétées</button>
-  <button class="tab-btn" onclick="switchTab('appt',this)"><span class="ti">📅</span>RDV</button>
-  <button class="tab-btn" onclick="switchTab('growth',this)"><span class="ti">📊</span>Suivi</button>
-  <button class="tab-btn" onclick="switchTab('setup',this)"><span class="ti">⚙️</span>Config</button>
-</div>
-
-<div class="scroll-area">
-
-<div class="section active" id="tab-feed">
-  <div class="alert-band" id="alertBand">
-    <span class="alert-band-icon">🔔</span>
-    <div class="alert-band-text">C'est l'heure de la tétée !</div>
-    <button class="btn-stop-alarm" onclick="stopAlarm()">Arrêter</button>
-  </div>
-  <div class="session-status" id="sessionStatus">
-    <div class="session-dot"></div>
-    <div class="session-text">Tétée en cours<span class="session-live" id="sessionLive"></span></div>
-  </div>
-  <div class="card card-gold">
-    <div class="timer-ring">
-      <div class="timer-label">Depuis la dernière tétée</div>
-      <div class="timer-circle">
-        <svg class="timer-svg" viewBox="0 0 150 150">
-          <circle class="timer-track" cx="75" cy="75" r="70"/>
-          <circle class="timer-progress" id="timerProgress" cx="75" cy="75" r="70" stroke="var(--gold)"/>
-        </svg>
-        <div class="timer-inner">
-          <div class="timer-val" id="timerVal">—</div>
-          <div class="timer-sub" id="timerSub">aucune tétée</div>
-        </div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-primary gold" id="btnStart" onclick="startFeed()"><span class="bi">▶</span>Commencer</button>
-      <button class="btn-primary" id="btnEnd" onclick="endFeed()" disabled><span class="bi">⏹</span>Terminer</button>
-    </div>
-  </div>
-  <div class="reco-box">
-    <div class="reco-box-title">Recommandation OMS</div>
-    <div class="reco-box-text" id="recoText">Configurez l'âge de bébé dans Config.</div>
-  </div>
-  <div class="sec-title">Historique du jour</div>
-  <div class="card" id="feedHistCard"><div class="empty"><span class="empty-icon">🍼</span>Aucune tétée aujourd'hui</div></div>
-</div>
-
-<div class="section" id="tab-appt">
-  <button class="btn-add" onclick="openModal('apptModal')">+ Ajouter un rendez-vous</button>
-  <div class="sec-title">Rendez-vous</div>
-  <div class="card" id="apptListCard"><div class="empty"><span class="empty-icon">📅</span>Aucun rendez-vous</div></div>
-</div>
-
-<div class="section" id="tab-growth">
-  <div class="growth-grid">
-    <div class="growth-stat"><div class="gs-icon">⚖️</div><div class="gs-val" id="gvWeight">—</div><div class="gs-unit">kg</div><div class="gs-label">Poids</div><div class="gs-date" id="gdWeight"></div></div>
-    <div class="growth-stat"><div class="gs-icon">📏</div><div class="gs-val" id="gvHeight">—</div><div class="gs-unit">cm</div><div class="gs-label">Taille</div><div class="gs-date" id="gdHeight"></div></div>
-  </div>
-  <button class="btn-add" onclick="openModal('growthModal')">+ Mettre à jour les mesures</button>
-  <div class="sec-title">Notes & observations</div>
-  <button class="btn-add" onclick="openModal('noteModal')">+ Ajouter une note</button>
-  <div class="card" id="notesCard"><div class="empty"><span class="empty-icon">📒</span>Aucune note</div></div>
-</div>
-
-<div class="section" id="tab-setup">
-  <div class="firebase-setup">
-    <div class="firebase-setup-title">🔥 Synchronisation Firebase</div>
-    <p>Pour synchroniser sur tous vos appareils, créez un projet gratuit sur <strong style="color:var(--gold)">console.firebase.google.com</strong> → Realtime Database, puis entrez vos clés ci-dessous.</p>
-    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">API Key</label><input class="inp" id="fbApiKey" type="text" placeholder="AIzaSy..."></div>
-    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">Project ID</label><input class="inp" id="fbProjectId" type="text" placeholder="mon-projet-bebecare"></div>
-    <div class="form-group"><label class="form-label" style="color:rgba(200,169,110,.7)">App ID</label><input class="inp" id="fbAppId" type="text" placeholder="1:123456789:web:abc..."></div>
-    <button class="firebase-setup-btn" onclick="saveFirebase()">Connecter Firebase</button>
-    <p style="margin-top:10px;margin-bottom:0;font-size:.7rem;opacity:.5;">Sans Firebase, les données sont sauvegardées localement sur cet appareil uniquement.</p>
-  </div>
-  <div class="card">
-    <div class="sec-title">Bébé</div>
-    <div class="setting-row"><div><div class="setting-label">Prénom</div></div><input class="inp inp-sm" id="cfgName" type="text" placeholder="Prénom"></div>
-    <div class="setting-row"><div><div class="setting-label">Date de naissance</div></div><input class="inp inp-sm" id="cfgDob" type="date"></div>
-    <div class="setting-row"><div><div class="setting-label">Alimentation</div></div><select class="inp inp-sm" id="cfgFeed"><option value="breast">Allaitement</option><option value="bottle">Biberon</option><option value="mixed">Mixte</option></select></div>
-  </div>
-  <div class="card">
-    <div class="sec-title">Alerte tétée</div>
-    <div class="setting-row">
-      <div><div class="setting-label">Intervalle</div><div class="setting-sub">Auto = selon l'âge OMS</div></div>
-      <select class="inp inp-sm" id="cfgAlert"><option value="auto">Auto</option><option value="1.5">1h30</option><option value="2">2h00</option><option value="2.5">2h30</option><option value="3">3h00</option><option value="3.5">3h30</option><option value="4">4h00</option><option value="5">5h00</option></select>
-    </div>
-  </div>
-  <div class="card">
-    <div class="sec-title">Référentiel OMS</div>
-    <table class="freq-table" id="freqTable">
-      <thead><tr><th>Âge</th><th>Fréquence</th><th>/Jour</th></tr></thead>
-      <tbody>
-        <tr data-min="0" data-max="30"><td>0–1 mois</td><td>2–3 h</td><td>8–12</td></tr>
-        <tr data-min="30" data-max="90"><td>1–3 mois</td><td>2h30–3h30</td><td>7–9</td></tr>
-        <tr data-min="90" data-max="180"><td>3–6 mois</td><td>3–4 h</td><td>6–8</td></tr>
-        <tr data-min="180" data-max="365"><td>6–12 mois</td><td>4–5 h</td><td>4–6</td></tr>
-        <tr data-min="365" data-max="9999"><td>12 mois+</td><td>à la demande</td><td>3–4</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <button class="save-btn-full" onclick="saveConfig()">Sauvegarder la configuration</button>
-  <button class="clear-btn-full" onclick="clearAll()">Effacer toutes les données</button>
-  <br><br>
-</div>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="apptModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Nouveau rendez-vous</div>
-    <div class="form-group"><label class="form-label">Type</label><select class="inp" id="mApptType"><option>Pédiatre</option><option>Vaccin</option><option>PMI / Sage-femme</option><option>Urgences</option><option>Autre</option></select></div>
-    <div class="form-group"><label class="form-label">Titre</label><input class="inp" id="mApptTitle" placeholder="Ex : Visite 1 mois"></div>
-    <div class="form-group"><label class="form-label">Date</label><input class="inp" id="mApptDate" type="date"></div>
-    <div class="form-group"><label class="form-label">Heure (optionnel)</label><input class="inp" id="mApptTime" type="time"></div>
-    <div class="form-group"><label class="form-label">Notes</label><textarea class="inp" id="mApptNotes" placeholder="Questions, documents…"></textarea></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('apptModal')">Annuler</button>
-      <button class="btn-confirm" onclick="saveAppt()">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="growthModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Mesures de bébé</div>
-    <div class="form-group"><label class="form-label">Poids (kg)</label><input class="inp" id="mGWeight" type="number" step="0.01" placeholder="Ex : 3.45"></div>
-    <div class="form-group"><label class="form-label">Taille (cm)</label><input class="inp" id="mGHeight" type="number" step="0.1" placeholder="Ex : 52.5"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('growthModal')">Annuler</button>
-      <button class="btn-confirm" onclick="saveGrowth()">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="noteModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Note & observation</div>
-    <div class="form-group"><label class="form-label">Note</label><textarea class="inp" id="mNoteText" style="min-height:100px" placeholder="Ex : Premier sourire…"></textarea></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('noteModal')">Annuler</button>
-      <button class="btn-confirm" onclick="saveNote()">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- Firebase compat SDK (global window.firebase) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- Firebase SDK -->
+<!-- Firebase compat SDK (pas besoin de type="module") -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────
-var gdb = {
-  babyName:'', babyDob:'', feedType:'breast', alertH:'auto',
-  feeds:[], appointments:[],
-  growth:{weight:null,weightDate:null,height:null,heightDate:null},
-  notes:[], firebaseConfig:null, fbUserId:null
-};
-var gFirebaseApp=null, gFbRef=null;
-var gAlarmInterval=null, gAlarmCtx=null;
-var gSessionInterval=null, gMainTimer=null;
-var gSessionStart=null;
+  const firebaseConfig = {
+    apiKey: "AIzaSyAISwVhNHw9tOCGcxf2tFIP6PlvwkgNFNU",
+    authDomain: "wail-2f163.firebaseapp.com",
+    databaseURL: "https://wail-2f163-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "wail-2f163",
+    storageBucket: "wail-2f163.firebasestorage.app",
+    messagingSenderId: "574017583409",
+    appId: "1:574017583409:web:dc2d1087b96d1853a35810",
+    measurementId: "G-T29T45SK3V"
+  };
 
-// ── LOCAL STORAGE ──────────────────────────────────────────────────────
-function loadLocal(){
-  try{ var s=localStorage.getItem('bebe_care_v3'); if(s) gdb=Object.assign(gdb,JSON.parse(s)); }catch(e){}
-}
-function saveLocal(){
-  try{ localStorage.setItem('bebe_care_v3',JSON.stringify(gdb)); }catch(e){}
-}
+  let db;
+  let firebaseReady = false;
 
-// ── FIREBASE ───────────────────────────────────────────────────────────
-function connectFirebase(cfg){
-  try{
-    var appName='bc'+Date.now();
-    gFirebaseApp=firebase.initializeApp(cfg,appName);
-    var fdb=gFirebaseApp.database();
-    var uid=gdb.fbUserId||('u'+Math.random().toString(36).slice(2,9));
-    gdb.fbUserId=uid; gdb.firebaseConfig=cfg; saveLocal();
-    gFbRef=fdb.ref('bebecare/'+uid);
-    gFbRef.on('value',function(snap){
-      var v=snap.val();
-      if(v){ gdb=Object.assign(gdb,v); saveLocal(); renderAll(); }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    firebaseReady = true;
+    console.log("✅ Firebase connecté");
+  } catch(e) {
+    console.warn("⚠️ Firebase non configuré, mode local activé:", e.message);
+  }
+
+  // ====== ÉTAT GLOBAL ======
+  let state = {
+    currentFeed: null,
+    feedHistory: [],
+    appointments: [],
+    nextAlarmTime: null,
+    intervalBetweenFeeds: 2.5,
+    babyName: "Wail",
+    babyBirthDate: new Date(Date.now() - 6*24*60*60*1000).toISOString().split('T')[0]
+  };
+
+  let alarmTimeout = null;
+  let alarmAudio = null;
+  let isAlarmRinging = false;
+  let feedTimerInterval = null;
+
+  // ====== FIREBASE / LOCALSTORAGE ======
+  function listenFirebase() {
+    if (!firebaseReady) { loadFromLocalStorage(); return; }
+
+    db.ref('wail/state').on('value', snap => {
+      if (snap.exists()) {
+        const data = snap.val();
+        state.currentFeed = data.currentFeed || null;
+        state.nextAlarmTime = data.nextAlarmTime || null;
+        state.intervalBetweenFeeds = data.intervalBetweenFeeds || 2.5;
+        state.babyName = data.babyName || "Wail";
+        state.babyBirthDate = data.babyBirthDate || state.babyBirthDate;
+        renderAll();
+        rescheduleAlarm();
+      }
     });
-    setSyncBadge('ok','Sync ✓');
-    showToast('🔥 Firebase connecté !');
-  }catch(e){ setSyncBadge('err','Erreur'); showToast('❌ '+e.message); }
-}
-function fbSave(){
-  if(gFbRef){
-    var d=JSON.parse(JSON.stringify(gdb));
-    delete d.firebaseConfig;
-    gFbRef.set(d).catch(function(){setSyncBadge('err','Sync ❌');});
+
+    db.ref('wail/feeds').on('value', snap => {
+      if (snap.exists()) {
+        state.feedHistory = Object.entries(snap.val())
+          .map(([id, v]) => ({id, ...v}))
+          .sort((a,b) => b.startTime - a.startTime);
+      } else { state.feedHistory = []; }
+      renderHistory(); renderStats();
+    });
+
+    db.ref('wail/appointments').on('value', snap => {
+      if (snap.exists()) {
+        state.appointments = Object.entries(snap.val())
+          .map(([id, v]) => ({id, ...v}))
+          .sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
+      } else { state.appointments = []; }
+      renderAppointments();
+    });
   }
-  saveLocal();
-}
-function setSyncBadge(cls,txt){
-  var b=document.getElementById('syncBadge');
-  b.className='sync-badge '+cls; b.textContent=txt;
-}
 
-// ── AGE & RECO ─────────────────────────────────────────────────────────
-function ageDays(){
-  if(!gdb.babyDob) return null;
-  return Math.floor((Date.now()-new Date(gdb.babyDob))/86400000);
-}
-function ageLabel(d){
-  if(d===null) return '—';
-  if(d<7) return d+' j';
-  if(d<30) return Math.floor(d/7)+' sem.';
-  if(d<365) return Math.floor(d/30)+' mois';
-  return Math.floor(d/365)+' an'+(Math.floor(d/365)>1?'s':'');
-}
-function recoInterval(){
-  var d=ageDays();
-  if(d===null||d<90) return 3;
-  if(d<180) return 3.5;
-  if(d<365) return 4.5;
-  return 5;
-}
-function recoText(){
-  var d=ageDays();
-  if(d===null) return 'Configurez la date de naissance dans Config.';
-  if(d<30)  return '0–1 mois · À la demande, toutes 2–3h, 8–12 fois/jour. Max 6h sans tétée.';
-  if(d<90)  return '1–3 mois · Toutes 2h30–3h30, 7–9 fois/jour. Nuits légèrement plus longues.';
-  if(d<180) return '3–6 mois · Toutes 3–4h, 6–8 fois/jour. Sommeil nocturne se consolide.';
-  if(d<365) return '6–12 mois · Toutes 4–5h, 4–6 fois/jour. Diversification en complément.';
-  return '12 mois+ · À la demande, 3–4 fois/jour en complément des repas.';
-}
-function alertMs(){
-  var h=gdb.alertH==='auto'?recoInterval():parseFloat(gdb.alertH);
-  return h*3600000;
-}
-
-// ── ALARM ──────────────────────────────────────────────────────────────
-function startAlarm(){
-  document.getElementById('alertBand').classList.add('show');
-  if(!gAlarmCtx){
-    try{gAlarmCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  function saveState() {
+    const s = {
+      currentFeed: state.currentFeed,
+      nextAlarmTime: state.nextAlarmTime,
+      intervalBetweenFeeds: state.intervalBetweenFeeds,
+      babyName: state.babyName,
+      babyBirthDate: state.babyBirthDate
+    };
+    if (firebaseReady) { db.ref('wail/state').set(s); }
+    else { localStorage.setItem('wail_state', JSON.stringify(s)); }
   }
-  playBeep(); gAlarmInterval=setInterval(playBeep,3500);
-  if('vibrate' in navigator) navigator.vibrate([600,200,600,200,600]);
-}
-function stopAlarm(){
-  document.getElementById('alertBand').classList.remove('show');
-  clearInterval(gAlarmInterval); gAlarmInterval=null;
-}
-function playBeep(){
-  if(!gAlarmCtx) return;
-  [880,1046,1318,1046,880].forEach(function(f,i){
-    var o=gAlarmCtx.createOscillator(), g=gAlarmCtx.createGain();
-    o.connect(g); g.connect(gAlarmCtx.destination);
-    o.frequency.value=f; o.type='sine';
-    var t=gAlarmCtx.currentTime+i*0.15;
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(0.25,t+0.05);
-    g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
-    o.start(t); o.stop(t+0.4);
-  });
-}
 
-// ── FEED SESSION ───────────────────────────────────────────────────────
-function startFeed(){
-  if(gSessionStart) return;
-  gSessionStart=Date.now();
-  document.getElementById('btnStart').disabled=true;
-  document.getElementById('btnEnd').disabled=false;
-  document.getElementById('sessionStatus').classList.add('show');
-  stopAlarm();
-  gSessionInterval=setInterval(tickSession,1000); tickSession();
-  showToast('▶ Tétée démarrée');
-}
-function endFeed(){
-  if(!gSessionStart) return;
-  var end=Date.now();
-  gdb.feeds.unshift({id:end,startTs:gSessionStart,endTs:end});
-  if(gdb.feeds.length>100) gdb.feeds=gdb.feeds.slice(0,100);
-  fbSave();
-  gSessionStart=null;
-  clearInterval(gSessionInterval);
-  document.getElementById('sessionStatus').classList.remove('show');
-  document.getElementById('sessionLive').textContent='';
-  document.getElementById('btnStart').disabled=false;
-  document.getElementById('btnEnd').disabled=true;
-  renderFeedHistory();
-  showToast('⏹ Tétée enregistrée');
-}
-function tickSession(){
-  if(!gSessionStart) return;
-  var e=Date.now()-gSessionStart;
-  var m=Math.floor(e/60000),s=Math.floor((e%60000)/1000);
-  document.getElementById('sessionLive').textContent=' · '+p2(m)+':'+p2(s);
-}
-function p2(n){ return n<10?'0'+n:''+n; }
-
-// ── MAIN TIMER ─────────────────────────────────────────────────────────
-function startMainTimer(){
-  clearInterval(gMainTimer);
-  gMainTimer=setInterval(tickTimer,1000); tickTimer();
-}
-function tickTimer(){
-  var vEl=document.getElementById('timerVal');
-  var sEl=document.getElementById('timerSub');
-  var pr=document.getElementById('timerProgress');
-  var done=gdb.feeds.filter(function(f){return f.endTs;});
-  if(!done.length){
-    vEl.textContent='—'; sEl.textContent='aucune tétée';
-    pr.style.strokeDashoffset=439.8; return;
+  function loadFromLocalStorage() {
+    try {
+      const s = localStorage.getItem('wail_state');
+      if (s) Object.assign(state, JSON.parse(s));
+      const f = localStorage.getItem('wail_feeds');
+      if (f) state.feedHistory = JSON.parse(f);
+      const a = localStorage.getItem('wail_appointments');
+      if (a) state.appointments = JSON.parse(a);
+    } catch(e) {}
+    renderAll(); rescheduleAlarm();
   }
-  var last=done[0].endTs;
-  var el=Date.now()-last;
-  var am=alertMs();
-  var ratio=Math.min(el/am,1);
-  pr.style.strokeDashoffset=439.8*(1-ratio);
-  var h=Math.floor(el/3600000),m=Math.floor((el%3600000)/60000),s=Math.floor((el%60000)/1000);
-  vEl.textContent=h>0?h+'h'+p2(m):p2(m)+':'+p2(s);
-  sEl.textContent='fin à '+new Date(last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  pr.style.stroke=ratio<0.75?'var(--sage)':(ratio<1?'var(--gold)':'var(--rose)');
-  if(ratio>=1&&!gAlarmInterval&&!gSessionStart) startAlarm();
-}
 
-// ── RENDER FEED ────────────────────────────────────────────────────────
-function renderFeedHistory(){
-  var card=document.getElementById('feedHistCard');
-  var today=new Date().toDateString();
-  var tf=gdb.feeds.filter(function(f){return new Date(f.startTs).toDateString()===today;});
-  if(!tf.length){ card.innerHTML='<div class="empty"><span class="empty-icon">🍼</span>Aucune tétée aujourd\'hui</div>'; return; }
-  card.innerHTML=tf.map(function(f){
-    var ss=new Date(f.startTs).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    var es=f.endTs?new Date(f.endTs).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'…';
-    var dur=f.endTs?Math.round((f.endTs-f.startTs)/60000)+' min':'';
-    return '<div class="hist-item">'+
-      '<div class="hist-dot'+(f.endTs?' ended':'')+'"></div>'+
-      '<div class="hist-info">'+
-        '<div class="hist-time">'+ss+' → '+es+'</div>'+
-        '<div class="hist-meta"><span>'+new Date(f.startTs).toLocaleDateString('fr-FR')+'</span>'+(dur?'<span class="hist-dur">'+dur+'</span>':'')+'</div>'+
-      '</div>'+
-      '<button class="btn-del" onclick="delFeed('+f.id+')">✕</button>'+
-    '</div>';
-  }).join('');
-}
-function delFeed(id){
-  gdb.feeds=gdb.feeds.filter(function(f){return f.id!==id;});
-  fbSave(); renderFeedHistory();
-}
-
-// ── APPOINTMENTS ───────────────────────────────────────────────────────
-function saveAppt(){
-  var t=document.getElementById('mApptTitle').value.trim();
-  var d=document.getElementById('mApptDate').value;
-  if(!t||!d){showToast('Titre et date requis');return;}
-  gdb.appointments.push({id:Date.now(),type:document.getElementById('mApptType').value,title:t,date:d,time:document.getElementById('mApptTime').value,notes:document.getElementById('mApptNotes').value.trim()});
-  gdb.appointments.sort(function(a,b){return a.date.localeCompare(b.date);});
-  fbSave(); closeModal('apptModal'); renderAppts(); showToast('📅 Rendez-vous ajouté');
-}
-function renderAppts(){
-  var card=document.getElementById('apptListCard');
-  if(!gdb.appointments.length){card.innerHTML='<div class="empty"><span class="empty-icon">📅</span>Aucun rendez-vous</div>';return;}
-  var today=new Date().toISOString().split('T')[0];
-  var ico={Pédiatre:'🩺',Vaccin:'💉','PMI / Sage-femme':'👩‍⚕️',Urgences:'🚨',Autre:'📌'};
-  card.innerHTML=gdb.appointments.map(function(a){
-    var d=new Date(a.date+'T12:00:00');
-    var cls=a.date<today?'past':(a.date===today?'today':'');
-    return '<div class="appt-item '+cls+'">'+
-      '<div class="appt-date-col"><div class="appt-dd">'+d.getDate()+'</div><div class="appt-mm">'+d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')+'</div></div>'+
-      '<div class="appt-body"><span class="appt-type-tag">'+(ico[a.type]||'📌')+' '+a.type+'</span><div class="appt-title-t">'+a.title+'</div>'+(a.time?'<div class="appt-when">⏰ '+a.time+'</div>':'')+(a.notes?'<div class="appt-notes-t">'+a.notes+'</div>':'')+'</div>'+
-      '<button class="btn-del" onclick="delAppt('+a.id+')">✕</button>'+
-    '</div>';
-  }).join('');
-}
-function delAppt(id){gdb.appointments=gdb.appointments.filter(function(a){return a.id!==id;});fbSave();renderAppts();}
-
-// ── GROWTH ─────────────────────────────────────────────────────────────
-function saveGrowth(){
-  var w=parseFloat(document.getElementById('mGWeight').value);
-  var h=parseFloat(document.getElementById('mGHeight').value);
-  var dt=new Date().toLocaleDateString('fr-FR');
-  if(!isNaN(w)){gdb.growth.weight=w;gdb.growth.weightDate=dt;}
-  if(!isNaN(h)){gdb.growth.height=h;gdb.growth.heightDate=dt;}
-  fbSave(); closeModal('growthModal'); renderGrowth(); showToast('📊 Mesures mises à jour');
-}
-function renderGrowth(){
-  document.getElementById('gvWeight').textContent=gdb.growth.weight?gdb.growth.weight.toFixed(2):'—';
-  document.getElementById('gdWeight').textContent=gdb.growth.weightDate||'';
-  document.getElementById('gvHeight').textContent=gdb.growth.height?gdb.growth.height.toFixed(1):'—';
-  document.getElementById('gdHeight').textContent=gdb.growth.heightDate||'';
-}
-
-// ── NOTES ──────────────────────────────────────────────────────────────
-function saveNote(){
-  var t=document.getElementById('mNoteText').value.trim();
-  if(!t) return;
-  gdb.notes.unshift({id:Date.now(),ts:Date.now(),text:t});
-  fbSave(); closeModal('noteModal'); renderNotes(); showToast('📝 Note enregistrée');
-}
-function renderNotes(){
-  var c=document.getElementById('notesCard');
-  if(!gdb.notes.length){c.innerHTML='<div class="empty"><span class="empty-icon">📒</span>Aucune note</div>';return;}
-  c.innerHTML=gdb.notes.map(function(n){
-    return '<div class="note-item">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
-        '<div class="note-when">'+new Date(n.ts).toLocaleDateString('fr-FR')+' · '+new Date(n.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</div>'+
-        '<button class="btn-del" onclick="delNote('+n.id+')">✕</button>'+
-      '</div>'+
-      '<div class="note-body">'+n.text+'</div>'+
-    '</div>';
-  }).join('');
-}
-function delNote(id){gdb.notes=gdb.notes.filter(function(n){return n.id!==id;});fbSave();renderNotes();}
-
-// ── CONFIG ─────────────────────────────────────────────────────────────
-function saveConfig(){
-  gdb.babyName=document.getElementById('cfgName').value.trim();
-  gdb.babyDob=document.getElementById('cfgDob').value;
-  gdb.feedType=document.getElementById('cfgFeed').value;
-  gdb.alertH=document.getElementById('cfgAlert').value;
-  fbSave(); updateHeader(); renderAll(); showToast('✅ Configuration sauvegardée');
-}
-function saveFirebase(){
-  var k=document.getElementById('fbApiKey').value.trim();
-  var p=document.getElementById('fbProjectId').value.trim();
-  var a=document.getElementById('fbAppId').value.trim();
-  if(!k||!p||!a){showToast('Remplissez tous les champs Firebase');return;}
-  connectFirebase({apiKey:k,authDomain:p+'.firebaseapp.com',databaseURL:'https://'+p+'-default-rtdb.firebaseio.com',projectId:p,appId:a});
-}
-function loadConfig(){
-  document.getElementById('cfgName').value=gdb.babyName||'';
-  document.getElementById('cfgDob').value=gdb.babyDob||'';
-  document.getElementById('cfgFeed').value=gdb.feedType||'breast';
-  document.getElementById('cfgAlert').value=gdb.alertH||'auto';
-  if(gdb.firebaseConfig){
-    document.getElementById('fbApiKey').value=gdb.firebaseConfig.apiKey||'';
-    document.getElementById('fbProjectId').value=gdb.firebaseConfig.projectId||'';
-    document.getElementById('fbAppId').value=gdb.firebaseConfig.appId||'';
+  function saveLocal(key, data) {
+    if (!firebaseReady) localStorage.setItem(key, JSON.stringify(data));
   }
-}
-function clearAll(){
-  if(!confirm('Effacer TOUTES les données ?')) return;
-  var fc=gdb.firebaseConfig,fi=gdb.fbUserId;
-  gdb={babyName:'',babyDob:'',feedType:'breast',alertH:'auto',feeds:[],appointments:[],growth:{weight:null,weightDate:null,height:null,heightDate:null},notes:[],firebaseConfig:fc,fbUserId:fi};
-  fbSave(); renderAll(); showToast('🗑️ Données effacées');
-}
 
-// ── HEADER ─────────────────────────────────────────────────────────────
-function updateHeader(){
-  var d=ageDays(), name=gdb.babyName||'Bébé';
-  document.getElementById('ageBadge').textContent=name+' · '+ageLabel(d);
-  document.getElementById('recoText').textContent=recoText();
-  document.querySelectorAll('#freqTable tbody tr').forEach(function(row){
-    row.classList.remove('cur');
-    row.querySelectorAll('.cur-badge').forEach(function(b){b.remove();});
-    if(d!==null&&d>=+row.dataset.min&&d<+row.dataset.max){
-      row.classList.add('cur');
-      row.cells[0].innerHTML+='<span class="cur-badge">✓</span>';
+  // ====== BIBERONS ======
+  function startFeed() {
+    if (state.currentFeed) return;
+    const now = Date.now();
+    state.currentFeed = { startTime: now, id: 'feed_' + now };
+    clearAlarm();
+    saveState();
+    renderFeedButton();
+    startFeedTimer();
+    showToast("🍼 Biberon commencé !");
+  }
+
+  function endFeed() {
+    if (!state.currentFeed) return;
+    const now = Date.now();
+    const duration = Math.round((now - state.currentFeed.startTime) / 1000 / 60);
+    const qty = parseInt(document.getElementById('qty-input').value) || 60;
+    const feed = { startTime: state.currentFeed.startTime, endTime: now, duration, quantity: qty };
+
+    state.nextAlarmTime = now + state.intervalBetweenFeeds * 3600000;
+
+    if (firebaseReady) {
+      db.ref('wail/feeds/' + state.currentFeed.id).set(feed);
+    } else {
+      state.feedHistory.unshift({id: state.currentFeed.id, ...feed});
+      saveLocal('wail_feeds', state.feedHistory);
+    }
+
+    state.currentFeed = null;
+    saveState();
+    stopFeedTimer();
+    renderFeedButton();
+    scheduleAlarm(state.nextAlarmTime);
+    showToast(`✅ Biberon terminé — ${duration} min · ${qty} ml · prochain dans ${state.intervalBetweenFeeds}h`);
+  }
+
+  // ====== TIMER ======
+  function startFeedTimer() {
+    stopFeedTimer();
+    feedTimerInterval = setInterval(() => {
+      if (!state.currentFeed) return;
+      const elapsed = Math.round((Date.now() - state.currentFeed.startTime) / 1000);
+      const m = Math.floor(elapsed/60).toString().padStart(2,'0');
+      const s = (elapsed%60).toString().padStart(2,'0');
+      const el = document.getElementById('feed-timer');
+      if (el) el.textContent = m + ':' + s;
+    }, 1000);
+  }
+  function stopFeedTimer() {
+    clearInterval(feedTimerInterval);
+    feedTimerInterval = null;
+  }
+
+  // ====== ALARMES ======
+  function scheduleAlarm(targetTime) {
+    clearAlarmTimeout();
+    if (!targetTime) return;
+    const delay = targetTime - Date.now();
+    if (delay <= 0) { triggerAlarm(); return; }
+    alarmTimeout = setTimeout(triggerAlarm, delay);
+  }
+
+  function rescheduleAlarm() {
+    if (state.nextAlarmTime && !state.currentFeed) scheduleAlarm(state.nextAlarmTime);
+  }
+
+  function clearAlarmTimeout() {
+    if (alarmTimeout) { clearTimeout(alarmTimeout); alarmTimeout = null; }
+  }
+
+  function clearAlarm() {
+    clearAlarmTimeout();
+    stopAlarm();
+  }
+
+  function triggerAlarm() {
+    isAlarmRinging = true;
+    document.getElementById('alarm-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    playAlarmSound();
+    if (navigator.vibrate) navigator.vibrate([500,200,500,200,500,200,1000]);
+    if (Notification.permission === 'granted') {
+      new Notification('🍼 Heure du biberon de Wail !', {
+        body: 'Il est l\'heure de donner le biberon !',
+        requireInteraction: true
+      });
+    }
+  }
+
+  function playAlarmSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const melody = [523,659,784,659,523,784,659,523];
+      function playMelody() {
+        const ctx = new AudioCtx();
+        let t = 0;
+        melody.forEach(freq => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = freq; osc.type = 'sine';
+          gain.gain.setValueAtTime(0.4, ctx.currentTime + t);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.3);
+          osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.3);
+          t += 0.35;
+        });
+      }
+      playMelody();
+      alarmAudio = setInterval(playMelody, 4000);
+    } catch(e) { console.warn("Audio non disponible:", e); }
+  }
+
+  function stopAlarm() {
+    if (alarmAudio) { clearInterval(alarmAudio); alarmAudio = null; }
+    isAlarmRinging = false;
+    document.getElementById('alarm-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function dismissAlarm() {
+    stopAlarm();
+    state.nextAlarmTime = Date.now() + 10 * 60000;
+    saveState();
+    scheduleAlarm(state.nextAlarmTime);
+    showToast("⏰ Rappel dans 10 minutes");
+  }
+
+  function startFeedFromAlarm() {
+    stopAlarm();
+    state.nextAlarmTime = null;
+    saveState();
+    startFeed();
+  }
+
+  // ====== RENDEZ-VOUS ======
+  function addAppointment() {
+    const title = document.getElementById('apt-title').value.trim();
+    const date = document.getElementById('apt-date').value;
+    const time = document.getElementById('apt-time').value;
+    const notes = document.getElementById('apt-notes').value.trim();
+    if (!title || !date || !time) { showToast("⚠️ Remplis le titre, la date et l'heure", 'warn'); return; }
+
+    const apt = { title, date, time, notes, createdAt: Date.now() };
+
+    if (firebaseReady) {
+      db.ref('wail/appointments').push(apt);
+    } else {
+      const id = 'apt_' + Date.now();
+      state.appointments.push({id, ...apt});
+      state.appointments.sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
+      saveLocal('wail_appointments', state.appointments);
+      renderAppointments();
+    }
+
+    ['apt-title','apt-date','apt-time','apt-notes'].forEach(id => document.getElementById(id).value = '');
+    showToast("📅 Rendez-vous ajouté !");
+
+    const aptTime = new Date(apt.date + 'T' + apt.time).getTime();
+    const delay = aptTime - 3600000 - Date.now();
+    if (delay > 0) setTimeout(() => {
+      showToast(`🏥 Rappel : ${apt.title} dans 1 heure !`, 'info');
+      if (Notification.permission === 'granted') new Notification('🏥 RDV dans 1h', { body: apt.title });
+    }, delay);
+  }
+
+  function deleteAppointment(id) {
+    if (!confirm('Supprimer ce rendez-vous ?')) return;
+    if (firebaseReady) { db.ref('wail/appointments/' + id).remove(); }
+    else {
+      state.appointments = state.appointments.filter(a => a.id !== id);
+      saveLocal('wail_appointments', state.appointments);
+      renderAppointments();
+    }
+  }
+
+  function deleteFeed(id) {
+    if (!confirm('Supprimer ce biberon ?')) return;
+    if (firebaseReady) { db.ref('wail/feeds/' + id).remove(); }
+    else {
+      state.feedHistory = state.feedHistory.filter(f => f.id !== id);
+      saveLocal('wail_feeds', state.feedHistory);
+      renderHistory(); renderStats();
+    }
+  }
+
+  // ====== NOTIFICATIONS ======
+  async function requestNotifications() {
+    if (!('Notification' in window)) { showToast("Non supporté sur ce navigateur", 'warn'); return; }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      showToast("🔔 Notifications activées !");
+      document.querySelectorAll('.notif-btn').forEach(b => { b.textContent = '✅ Activées'; b.disabled = true; });
+    } else { showToast("⚠️ Notifications refusées", 'warn'); }
+  }
+
+  // ====== INTERVALLE ======
+  function setIntervalFeeds(h) {
+    state.intervalBetweenFeeds = h;
+    saveState();
+    document.querySelectorAll('.interval-btn').forEach(b => {
+      b.classList.toggle('active', parseFloat(b.dataset.h) === h);
+    });
+    showToast(`⏱️ Intervalle réglé sur ${h}h`);
+  }
+
+  // ====== TABS ======
+  function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  }
+
+  // ====== RENDER ======
+  function renderAll() {
+    renderFeedButton(); renderNext(); renderStats(); renderBabyAge();
+    renderHistory(); renderAppointments();
+  }
+
+  function renderFeedButton() {
+    const el = document.getElementById('feed-btn-area');
+    if (!el) return;
+    if (state.currentFeed) {
+      el.innerHTML = `
+        <div class="feed-active">
+          <div class="pulse-ring"></div>
+          <div class="feed-active-label">🍼 Biberon en cours...</div>
+          <div class="feed-timer" id="feed-timer">00:00</div>
+          <div class="qty-row">
+            <label>Quantité (ml)</label>
+            <input type="number" id="qty-input" value="60" min="10" max="300" class="qty-input">
+          </div>
+          <button class="btn btn-end" onclick="endFeed()">✓ Terminer le biberon</button>
+        </div>`;
+      startFeedTimer();
+    } else {
+      el.innerHTML = `
+        <button class="btn btn-start" onclick="startFeed()">
+          <span class="btn-icon">🍼</span>
+          Commencer le biberon
+        </button>`;
+    }
+  }
+
+  function renderNext() {
+    const el = document.getElementById('next-feed');
+    if (!el) return;
+    if (state.currentFeed) { el.innerHTML = `<span class="next-label">Biberon en cours 🟢</span>`; return; }
+    if (!state.nextAlarmTime) { el.innerHTML = `<span class="next-label">Aucun biberon planifié</span>`; return; }
+    const remaining = state.nextAlarmTime - Date.now();
+    if (remaining <= 0) { el.innerHTML = `<span class="next-label urgent">🚨 HEURE DU BIBERON !</span>`; return; }
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    const time = new Date(state.nextAlarmTime).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    el.innerHTML = `
+      <div class="countdown-wrap">
+        <div class="countdown-label">Prochain biberon à <strong>${time}</strong></div>
+        <div class="countdown">
+          <span class="cd-num">${String(h).padStart(2,'0')}</span>h
+          <span class="cd-num">${String(m).padStart(2,'0')}</span>m
+          <span class="cd-num">${String(s).padStart(2,'0')}</span>s
+        </div>
+      </div>`;
+  }
+
+  function renderStats() {
+    const el = document.getElementById('stats-area');
+    if (!el) return;
+    const last24h = state.feedHistory.filter(f => Date.now() - f.startTime < 86400000);
+    const totalQty = last24h.reduce((a,f) => a + (f.quantity||0), 0);
+    const avgDur = last24h.length ? Math.round(last24h.reduce((a,f)=>a+f.duration,0)/last24h.length) : 0;
+    el.innerHTML = `
+      <div class="stat-card"><div class="stat-num">${last24h.length}</div><div class="stat-lbl">biberons / 24h</div></div>
+      <div class="stat-card"><div class="stat-num">${totalQty}ml</div><div class="stat-lbl">lait / 24h</div></div>
+      <div class="stat-card"><div class="stat-num">${avgDur}min</div><div class="stat-lbl">durée moy.</div></div>`;
+  }
+
+  function renderBabyAge() {
+    const el = document.getElementById('baby-age');
+    if (!el) return;
+    const days = Math.floor((Date.now() - new Date(state.babyBirthDate)) / 86400000);
+    el.textContent = `${days} jours`;
+  }
+
+  function renderHistory() {
+    const el = document.getElementById('history-list');
+    if (!el) return;
+    if (!state.feedHistory.length) { el.innerHTML = '<div class="empty-state">Aucun biberon enregistré</div>'; return; }
+    el.innerHTML = state.feedHistory.slice(0,30).map(f => {
+      const d = new Date(f.startTime);
+      return `<div class="history-item">
+        <div class="history-icon">🍼</div>
+        <div class="history-info">
+          <div class="history-time">${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+          <div class="history-detail">${f.duration||'?'} min · ${f.quantity||'?'} ml</div>
+        </div>
+        <button class="delete-btn" onclick="deleteFeed('${f.id}')">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function renderAppointments() {
+    const el = document.getElementById('apt-list');
+    if (!el) return;
+    if (!state.appointments.length) { el.innerHTML = '<div class="empty-state">Aucun rendez-vous</div>'; return; }
+    const now = new Date();
+    const upcoming = state.appointments.filter(a => new Date(a.date+'T'+a.time) >= now);
+    const past = state.appointments.filter(a => new Date(a.date+'T'+a.time) < now);
+    const aptHTML = (a, isPast) => {
+      const dt = new Date(a.date+'T'+a.time);
+      return `<div class="apt-item ${isPast?'past':''}">
+        <div class="apt-icon">🏥</div>
+        <div class="apt-info">
+          <div class="apt-title">${a.title}</div>
+          <div class="apt-dt">${dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} · ${dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+          ${a.notes?`<div class="apt-notes">${a.notes}</div>`:''}
+        </div>
+        <button class="delete-btn" onclick="deleteAppointment('${a.id}')">✕</button>
+      </div>`;
+    };
+    el.innerHTML = upcoming.map(a=>aptHTML(a,false)).join('') +
+      (past.length ? `<div class="section-sub">Passés</div>` + past.map(a=>aptHTML(a,true)).join('') : '');
+  }
+
+  // ====== TOAST ======
+  function showToast(msg, type='success') {
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
+  }
+
+  // ====== COUNTDOWN LIVE ======
+  setInterval(() => {
+    renderNext();
+    renderBabyAge();
+    if (state.nextAlarmTime && !state.currentFeed && Date.now() > state.nextAlarmTime && !isAlarmRinging && !alarmTimeout) {
+      triggerAlarm();
+    }
+  }, 1000);
+
+  // ====== INIT ======
+  document.addEventListener('DOMContentLoaded', () => {
+    listenFirebase();
+    showTab('home');
+    document.querySelectorAll('.interval-btn').forEach(b => {
+      b.classList.toggle('active', parseFloat(b.dataset.h) === state.intervalBetweenFeeds);
+    });
+    if ('Notification' in window && Notification.permission === 'default') {
+      setTimeout(requestNotifications, 2000);
+    } else if (Notification.permission === 'granted') {
+      document.querySelectorAll('.notif-btn').forEach(b => { b.textContent = '✅ Activées'; b.disabled = true; });
     }
   });
-}
-
-// ── TABS / MODALS / TOAST ──────────────────────────────────────────────
-function switchTab(tab,btn){
-  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  btn.classList.add('active');
-  document.querySelector('.scroll-area').scrollTop=0;
-}
-function openModal(id){
-  if(id==='apptModal'){document.getElementById('mApptTitle').value='';document.getElementById('mApptNotes').value='';document.getElementById('mApptTime').value='';document.getElementById('mApptDate').value=new Date().toISOString().split('T')[0];}
-  if(id==='growthModal'){document.getElementById('mGWeight').value=gdb.growth.weight||'';document.getElementById('mGHeight').value=gdb.growth.height||'';}
-  if(id==='noteModal') document.getElementById('mNoteText').value='';
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-overlay').forEach(function(o){
-  o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});
-});
-function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2800);
-}
-
-// ── RENDER ALL ─────────────────────────────────────────────────────────
-function renderAll(){
-  updateHeader(); renderFeedHistory(); renderAppts(); renderGrowth(); renderNotes(); loadConfig();
-}
-
-// ── INIT ───────────────────────────────────────────────────────────────
-loadLocal();
-renderAll();
-startMainTimer();
-if(gdb.firebaseConfig){
-  setSyncBadge('ok','Firebase');
-  try{connectFirebase(gdb.firebaseConfig);}catch(e){setSyncBadge('err','Erreur');}
-}
-setInterval(function(){updateHeader();},60000);
-if('Notification' in window&&Notification.permission==='default') Notification.requestPermission();
 </script>
+
+<style>
+  :root {
+    --cream: #FFF8F0;
+    --peach: #FFD6B8;
+    --blush: #F2A07B;
+    --warm: #E8845A;
+    --deep: #C25E34;
+    --navy: #2C3E6B;
+    --mint: #B8EDD6;
+    --mint-dark: #6BC89E;
+    --text: #2A1F1A;
+    --text-light: #7A6055;
+    --card: #FFFFFF;
+    --shadow: 0 4px 24px rgba(44,30,20,0.08);
+    --radius: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 90px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, var(--warm) 0%, var(--deep) 100%);
+    padding: 28px 24px 20px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: -20px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .header-emoji { font-size: 40px; display: block; margin-bottom: 4px; }
+  .header-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .header-age {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 2px;
+    font-weight: 300;
+  }
+  #baby-age { font-weight: 700; }
+
+  /* ===== TABS ===== */
+  .tabs {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    display: flex;
+    border-top: 1px solid #f0e8e0;
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+  .tab-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px 4px 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .tab-btn .tab-icon { font-size: 22px; }
+  .tab-btn.active { color: var(--warm); }
+  .tab-btn.active .tab-icon { transform: scale(1.15); }
+
+  /* ===== CONTENT ===== */
+  .tab-content { display: none; padding: 20px 16px; }
+  .tab-content.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+  }
+
+  /* ===== FEED BUTTONS ===== */
+  .btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-start {
+    background: linear-gradient(135deg, var(--warm) 0%, var(--deep) 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(194,94,52,0.35);
+    font-size: 18px;
+    padding: 22px;
+  }
+  .btn-start:active { transform: scale(0.97); }
+  .btn-icon { font-size: 28px; }
+  .btn-end {
+    background: linear-gradient(135deg, var(--mint-dark) 0%, #3aab7a 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(107,200,158,0.35);
+    margin-top: 16px;
+  }
+
+  /* ===== FEED ACTIVE ===== */
+  .feed-active {
+    text-align: center;
+    position: relative;
+  }
+  .pulse-ring {
+    width: 80px; height: 80px;
+    background: rgba(194,94,52,0.12);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    animation: pulse 1.5s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pulse-ring::after {
+    content: '🍼';
+    font-size: 36px;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+  }
+  .feed-active-label { font-weight: 700; color: var(--warm); font-size: 16px; }
+  .feed-timer {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--deep);
+    letter-spacing: 2px;
+    margin: 8px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .qty-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-light);
+  }
+  .qty-input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 2px solid var(--peach);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--deep);
+    text-align: center;
+    outline: none;
+  }
+  .qty-input:focus { border-color: var(--warm); }
+
+  /* ===== COUNTDOWN ===== */
+  #next-feed { text-align: center; }
+  .countdown-label { font-size: 14px; color: var(--text-light); margin-bottom: 8px; }
+  .countdown {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--deep);
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .cd-num {
+    background: var(--peach);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .next-label { font-size: 16px; color: var(--text-light); }
+  .urgent { color: var(--deep) !important; font-weight: 800; font-size: 20px !important; animation: blink 0.8s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ===== STATS ===== */
+  #stats-area {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .stat-card {
+    background: linear-gradient(135deg, #FFF0E6 0%, #FFE4CE 100%);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .stat-num { font-size: 22px; font-weight: 800; color: var(--deep); }
+  .stat-lbl { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+  /* ===== INTERVAL SELECTOR ===== */
+  .interval-row { display: flex; gap: 10px; }
+  .interval-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--peach);
+    border-radius: 12px;
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .interval-btn.active {
+    border-color: var(--warm);
+    background: var(--warm);
+    color: white;
+    box-shadow: 0 4px 12px rgba(194,94,52,0.25);
+  }
+
+  /* ===== HISTORY ===== */
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5ede6;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-icon { font-size: 24px; flex-shrink: 0; }
+  .history-info { flex: 1; }
+  .history-time { font-weight: 700; font-size: 14px; }
+  .history-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover { background: #fee; color: #e55; }
+
+  /* ===== APPOINTMENTS ===== */
+  .apt-form input, .apt-form textarea, .apt-form select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #F0E4D8;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    margin-bottom: 10px;
+    outline: none;
+    background: white;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .apt-form input:focus, .apt-form textarea:focus { border-color: var(--warm); }
+  .apt-form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .apt-form .btn-add {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2d5a 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .apt-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f5ede6;
+  }
+  .apt-item:last-child { border-bottom: none; }
+  .apt-item.past { opacity: 0.5; }
+  .apt-icon { font-size: 28px; flex-shrink: 0; }
+  .apt-title { font-weight: 700; font-size: 15px; }
+  .apt-dt { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .apt-notes { font-size: 12px; color: var(--text-light); margin-top: 4px; font-style: italic; }
+  .section-sub {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin: 16px 0 8px;
+  }
+
+  /* ===== NOTIF BUTTON ===== */
+  .notif-card {
+    background: linear-gradient(135deg, #EFF4FF 0%, #E0EAFF 100%);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .notif-card button {
+    margin-left: auto;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .notif-card button:disabled { background: var(--mint-dark); }
+
+  /* ===== ALARM MODAL ===== */
+  #alarm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(44,30,20,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .alarm-box {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 24px;
+    text-align: center;
+    max-width: 340px;
+    width: 100%;
+    animation: pop 0.3s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .alarm-emoji { font-size: 64px; display: block; animation: wiggle 0.5s ease-in-out infinite alternate; }
+  @keyframes wiggle {
+    0% { transform: rotate(-10deg); }
+    100% { transform: rotate(10deg); }
+  }
+  .alarm-title { font-size: 24px; font-weight: 800; color: var(--deep); margin: 12px 0 6px; }
+  .alarm-sub { font-size: 16px; color: var(--text-light); margin-bottom: 24px; }
+  .alarm-btns { display: flex; flex-direction: column; gap: 12px; }
+  .alarm-btn-main {
+    background: linear-gradient(135deg, var(--warm), var(--deep));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(194,94,52,0.35);
+  }
+  .alarm-btn-snooze {
+    background: #f0e8e0;
+    color: var(--text-light);
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast-warn { background: #E88020; }
+  .toast-info { background: var(--navy); }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    padding: 20px 0;
+  }
+
+  /* ===== SETTINGS TAB ===== */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f5ede6;
+  }
+  .settings-label { font-weight: 600; font-size: 15px; }
+  .settings-sub { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .firebase-info {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #7d6608;
+  }
+  .firebase-info code {
+    background: rgba(0,0,0,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* ===== INFO CARD ===== */
+  .info-card {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #1e5a7e;
+    line-height: 1.6;
+    border-left: 4px solid #38BDF8;
+  }
+  .info-card strong { display: block; margin-bottom: 4px; font-size: 14px; }
+</style>
+</head>
+
+<body>
+
+<!-- ALARM MODAL -->
+<div id="alarm-modal">
+  <div class="alarm-box">
+    <span class="alarm-emoji">🍼</span>
+    <div class="alarm-title">Heure du biberon !</div>
+    <div class="alarm-sub" id="baby-age-modal">C'est l'heure du biberon de Wail !</div>
+    <div class="alarm-btns">
+      <button class="alarm-btn-main" onclick="startFeedFromAlarm()">🍼 Commencer maintenant</button>
+      <button class="alarm-btn-snooze" onclick="dismissAlarm()">⏰ Rappel dans 10 min</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <span class="header-emoji">👶</span>
+  <div class="header-name">Wail</div>
+  <div class="header-age"><span id="baby-age">6</span> jours 🌟</div>
+</div>
+
+<!-- HOME TAB -->
+<div class="tab-content active" id="tab-home">
+
+  <div class="notif-card">
+    <div>
+      <div style="font-weight:700; font-size:14px;">Activer les alarmes</div>
+      <div style="font-size:12px; color:var(--text-light);">Pour recevoir les alertes biberon</div>
+    </div>
+    <button id="notif-btn" class="notif-btn" onclick="requestNotifications()">🔔 Activer</button>
+  </div>
+
+  <div class="info-card">
+    <strong>📋 Guide pédiatrique — Wail (6 jours)</strong>
+    Rythme recommandé : <b>6 à 8 biberons par 24h</b>, toutes les <b>2h30 à 3h</b><br>
+    Quantité : <b>60–70 ml</b> par biberon à cet âge<br>
+    <small>Source : AFPA / mpedia.fr</small>
+  </div>
+
+  <!-- BIBERON BUTTON -->
+  <div class="card">
+    <div class="card-title">🍼 Biberon</div>
+    <div id="feed-btn-area">
+      <button class="btn btn-start" onclick="startFeed()">
+        <span class="btn-icon">🍼</span>
+        Commencer le biberon
+      </button>
+    </div>
+  </div>
+
+  <!-- PROCHAIN -->
+  <div class="card">
+    <div class="card-title">⏱️ Prochain biberon</div>
+    <div id="next-feed"><span class="next-label">Aucun biberon planifié</span></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <div class="card-title">📊 Statistiques 24h</div>
+    <div id="stats-area">
+      <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">biberons</div></div>
+      <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">lait total</div></div>
+      <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">durée moy.</div></div>
+    </div>
+  </div>
+
+  <!-- INTERVALLE -->
+  <div class="card">
+    <div class="card-title">⚙️ Intervalle entre biberons</div>
+    <div class="interval-row">
+      <button class="interval-btn" data-h="2" onclick="setIntervalFeeds(2)">2h</button>
+      <button class="interval-btn active" data-h="2.5" onclick="setIntervalFeeds(2.5)">2h30</button>
+      <button class="interval-btn" data-h="3" onclick="setIntervalFeeds(3)">3h</button>
+      <button class="interval-btn" data-h="4" onclick="setIntervalFeeds(4)">4h</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY TAB -->
+<div class="tab-content" id="tab-history">
+  <div class="card">
+    <div class="card-title">🕐 Historique des biberons</div>
+    <div id="history-list"><div class="empty-state">Aucun biberon enregistré</div></div>
+  </div>
+</div>
+
+<!-- APPOINTMENTS TAB -->
+<div class="tab-content" id="tab-rdv">
+  <div class="card">
+    <div class="card-title">➕ Ajouter un rendez-vous</div>
+    <div class="apt-form">
+      <input type="text" id="apt-title" placeholder="Ex: Pédiatre Dr. Martin" />
+      <div class="row2">
+        <input type="date" id="apt-date" />
+        <input type="time" id="apt-time" />
+      </div>
+      <textarea id="apt-notes" placeholder="Notes (adresse, téléphone...)" rows="2"></textarea>
+      <button class="btn-add" onclick="addAppointment()">📅 Ajouter le rendez-vous</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Mes rendez-vous</div>
+    <div id="apt-list"><div class="empty-state">Aucun rendez-vous</div></div>
+  </div>
+</div>
+
+<!-- SETTINGS TAB -->
+<div class="tab-content" id="tab-settings">
+  <div class="card">
+    <div class="card-title">⚙️ Configuration Firebase</div>
+    <div class="firebase-info" style="background:#f0fff4; border-color:#86efac; color:#166534;">
+      <strong>✅ Firebase connecté — projet "wail"</strong><br>
+      Les données sont synchronisées en temps réel entre tous tes appareils.<br>
+      Téléphone + ordinateur = même données 🔄<br><br>
+      <strong>⚠️ Dernière étape :</strong> Active la <strong>Realtime Database</strong> dans la console Firebase si ce n'est pas encore fait :<br>
+      Menu gauche → Bases de données → Realtime Database → Créer → Europe → Mode Test
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">ℹ️ Informations</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Prénom du bébé</div>
+        <div class="settings-sub">Wail</div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Intervalle biberons</div>
+        <div class="settings-sub" id="interval-display">2h30 (recommandé à cet âge)</div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Notifications</div>
+        <div class="settings-sub">Alarmes pour chaque biberon</div>
+      </div>
+      <button class="notif-btn" onclick="requestNotifications()" style="background:var(--warm);color:white;border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">
+        🔔 Activer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS NAV -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="home" onclick="showTab('home')">
+    <span class="tab-icon">🏠</span>
+    Accueil
+  </button>
+  <button class="tab-btn" data-tab="history" onclick="showTab('history')">
+    <span class="tab-icon">📋</span>
+    Historique
+  </button>
+  <button class="tab-btn" data-tab="rdv" onclick="showTab('rdv')">
+    <span class="tab-icon">📅</span>
+    Rendez-vous
+  </button>
+  <button class="tab-btn" data-tab="settings" onclick="showTab('settings')">
+    <span class="tab-icon">⚙️</span>
+    Réglages
+  </button>
+</div>
+
 </body>
 </html>
